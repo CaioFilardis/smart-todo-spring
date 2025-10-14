@@ -5,19 +5,19 @@ import lombok.Data;
 
 import java.time.OffsetDateTime;
 
-@Data // indica a geração de getters e setters / toString / equals e hashcode pelo Lombook
-@Entity // indica que é uma entidade JPA
-@Table(name = "users") // indica que renomeia a entidade mapeia para a tabela users
+@Data
+@Entity
+@Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // indica a configuração estratégica da chave primária
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nome", nullable = false) // mapeia para o nome da coluna e marca como não-nula
+    @Column(name = "nome", nullable = false)
     private String nome;
 
-    @Column(name = "email", nullable = false, unique = false) // indica unicidade e não-nulidade a nível de JPA
+    @Column(name = "email", nullable = false, unique = false)
     private String email;
 
     @Column(name = "password", nullable = false)
@@ -26,13 +26,13 @@ public class User {
     @Column(name = "criadoEm", nullable = false)
     private OffsetDateTime criadoEm;
 
-    @Column(name = "atualizadoEm", nullable = false, updatable = false) // indica proteção do campo há atualizações
+    @Column(name = "atualizadoEm", nullable = false, updatable = false)
     private OffsetDateTime atualizadoEm;
 
 
     // gerando métodos - Ciclo de vioda JPA
 
-    @PrePersist // indica automação
+    @PrePersist
     protected void criacao() {
         this.criadoEm = OffsetDateTime.now();
         this.atualizadoEm = OffsetDateTime.now();
