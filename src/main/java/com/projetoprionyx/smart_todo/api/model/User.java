@@ -28,4 +28,18 @@ public class User {
 
     @Column(name = "atualizadoEm", nullable = false, updatable = false) // indica proteção do campo há atualizações
     private OffsetDateTime atualizadoEm;
+
+
+    // gerando métodos - Ciclo de vioda JPA
+
+    @PrePersist // indica automação
+    protected void criacao() {
+        this.criadoEm = OffsetDateTime.now();
+        this.atualizadoEm = OffsetDateTime.now();
+    }
+
+    @PreUpdate
+    protected void atualizacao() {
+        this.atualizadoEm = OffsetDateTime.now();
+    }
 }
