@@ -3,11 +3,15 @@ package com.projetoprionyx.smart_todo.api.model;
 import com.projetoprionyx.smart_todo.api.model.enums.TaksPriority;
 import com.projetoprionyx.smart_todo.api.model.enums.TasksStatus;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.OffsetDateTime;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "tasks")
 public class Task {
@@ -41,4 +45,15 @@ public class Task {
 
     @Column(name = "atualizadoEm", nullable = false)
     private OffsetDateTime autalizadoEm;
+
+    // ---- métodos
+    protected void criado() {
+        this.criadoEm = OffsetDateTime.now();
+        this.autalizadoEm = OffsetDateTime.now();
+    }
+
+    protected void atualizado() {
+        this.autalizadoEm = OffsetDateTime.now();
+    }
+
 }

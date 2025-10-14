@@ -1,11 +1,18 @@
 package com.projetoprionyx.smart_todo.api.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "users")
 public class User {
@@ -22,6 +29,17 @@ public class User {
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    // --- Mapeamento de relacionamento One-to-many
+    @OneToMany(
+            mappedBy = "user", // campo da entidade
+            cascade = CascadeType.ALL, // propagar para a Tasks
+            orphanRemoval = true // deletar Task do banco de removida da lista
+    )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Task> tasks = new ArrayList<>();
+
 
     @Column(name = "criadoEm", nullable = false)
     private OffsetDateTime criadoEm;
