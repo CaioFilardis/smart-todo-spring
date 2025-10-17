@@ -1,5 +1,7 @@
 package com.projetoprionyx.smart_todo.api.security.config;
 
+import com.projetoprionyx.smart_todo.api.security.jwt.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 // configuração de segurança
 @Configuration
@@ -22,9 +25,8 @@ public class SecurityConfig {
         this.authenticationConfiguration = authenticationConfiguration;
     }
 
-    // TODO
-    // @Autowired
-    // private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -47,6 +49,9 @@ public class SecurityConfig {
                         .requestMatchers("api/v1/auth/**").permitAll()
                         .anyRequest().authenticated()
                 );
+
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }
