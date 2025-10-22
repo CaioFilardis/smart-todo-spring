@@ -1,13 +1,14 @@
 package com.projetoprionyx.smart_todo.api.model;
 
-import com.projetoprionyx.smart_todo.api.model.enums.TaksPriority;
-import com.projetoprionyx.smart_todo.api.model.enums.TasksStatus;
+import com.projetoprionyx.smart_todo.api.model.enums.TaskPriority; // Renomear Enum
+import com.projetoprionyx.smart_todo.api.model.enums.TaskStatus;   // Renomear Enum
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
+import java.time.OffsetDateTime; // Ou LocalDateTime
 
 @Getter
 @Setter
@@ -16,44 +17,47 @@ import java.time.OffsetDateTime;
 @Table(name = "tasks")
 public class Task {
 
+    @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // -- Relacionamento: Muitas tarefas para um usuário ---
-    @ManyToOne(fetch = FetchType.LAZY) // indica melhor prática para performar
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    // ------------------------------------------------------
 
-    @Column(nullable = false)
-    private String titulo;
+    @Column(name = "title", nullable = false)
+    private String title;
 
-    @Column(columnDefinition = "TEXT") // indica tipo de coluna para campos longos
-    private String descricao;
-
-    @Enumerated(EnumType.STRING) // salva um 'Enum' como String
-    @Column(nullable = false)
-    private TasksStatus status;
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TaksPriority priority;
+    @Column(name = "status", nullable = false)
+    private TaskStatus status;
 
-    @Column(name = "criadoEm", nullable = false, updatable = false)
-    private OffsetDateTime criadoEm;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "priority") // CORRIGIDO: NULL por padrão no DB, então não precisa de 'nullable = false'
+    private TaskPriority priority;
 
-    @Column(name = "atualizadoEm", nullable = false)
-    private OffsetDateTime autalizadoEm;
+    @Column(name = "due_date")
+    private LocalDate dueDate;
 
-    // ---- métodos
-    protected void criado() {
-        this.criadoEm = OffsetDateTime.now();
-        this.autalizadoEm = OffsetDateTime.now();
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private OffsetDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private OffsetDateTime updatedAt;
+
+    // CORRIGIDO: Adicionando as anotações de ciclo de vida
+    @PrePersist
+    protected void onPersist() {
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
     }
 
-    protected void atualizado() {
-        this.autalizadoEm = OffsetDateTime.now();
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = OffsetDateTime.now();
     }
-
 }

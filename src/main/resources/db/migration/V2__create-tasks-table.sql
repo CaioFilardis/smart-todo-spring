@@ -1,19 +1,19 @@
-create table tasks
-(
-    id             bigint       not null auto_increment,
-    user_id        bigint       not null,
-    titulo         varchar(255) not null,
-    descricao      text null,
-    status         enum('PENDENTE', 'COMPLETO') not null DEFAULT 'PENDENTE',
-    prioridade     enum('ALTO', 'MEDIO', 'BAIXO') null,
-    dataVencimento date null,
-    criadoEm       timestamp    not null default CURRENT_TIMESTAMP,
-    atualizadoEm   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+-- Padrão snake_case, nomes em inglês e correção dos ENUMs.
+CREATE TABLE tasks (
+                       id           BIGINT                             NOT NULL AUTO_INCREMENT,
+                       user_id      BIGINT                             NOT NULL,
+                       title        VARCHAR(255)                       NOT NULL,
+                       description  TEXT                               NULL,
+                       status       ENUM('PENDING', 'COMPLETED')       NOT NULL DEFAULT 'PENDING',
+                       priority     ENUM('HIGH', 'MEDIUM', 'LOW')      NULL,
+                       due_date     DATE                               NULL,
+                       created_at   TIMESTAMP                          NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                       updated_at   TIMESTAMP                          NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    primary key (id),
+                       PRIMARY KEY (id),
 
-    constraint fk_tasks_users
-        foreign key (user_id)
-            references users (id)
-            On delete cascade
+                       CONSTRAINT fk_tasks_users
+                           FOREIGN KEY (user_id)
+                               REFERENCES users (id)
+                               ON DELETE CASCADE
 );

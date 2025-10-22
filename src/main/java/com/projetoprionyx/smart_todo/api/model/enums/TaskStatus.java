@@ -1,7 +1,7 @@
 package com.projetoprionyx.smart_todo.api.model.enums;
 
-public enum TasksStatus {
+public enum TaskStatus {
 
-    PENDENTE,
-    COMPLETO
+    PENDING,
+    COMPLETED
 }

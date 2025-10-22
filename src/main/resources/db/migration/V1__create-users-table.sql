@@ -1,12 +1,12 @@
-create table users
-(
-    id          bigint       not null auto_increment,
-    nome         varchar(255) not null,
-    email        varchar(255) not null,
-    passoword    varchar(255) not null,
-    criadoEm     timestamp    not null default current_timestamp,
-    atualizadoEm timestamp    not null default current_timestamp on update current_timestamp,
+-- Padrão snake_case, nomes em inglês e correção do 'password'.
+CREATE TABLE users (
+                       id           BIGINT       NOT NULL AUTO_INCREMENT,
+                       full_name    VARCHAR(255) NOT NULL,
+                       email        VARCHAR(255) NOT NULL,
+                       password     VARCHAR(255) NOT NULL,
+                       created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                       updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    primary key (id),
-    unique key uk_users_email (email)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+                       PRIMARY KEY (id),
+                       UNIQUE KEY uk_users_email (email)
+);

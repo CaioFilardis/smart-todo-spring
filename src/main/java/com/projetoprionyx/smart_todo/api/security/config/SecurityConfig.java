@@ -40,7 +40,7 @@ public class SecurityConfig {
     }
 
     // cadeia de filtros de segurança que será aplicada a cada requisição HTTP.
-
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // desabilitar o csrf(Cross-Site Request Forgery)

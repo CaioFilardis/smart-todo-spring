@@ -1,8 +1,8 @@
 package com.projetoprionyx.smart_todo.api.model.enums;
 
-public enum TaksPriority {
+public enum TaskPriority {
 
-    ALTO,
-    MEDIO,
-    FACIL
+    HIGH,
+    MEDIUM,
+    LOW
 }

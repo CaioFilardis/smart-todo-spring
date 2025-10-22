@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.OffsetDateTime;
+import java.time.OffsetDateTime; // Ou LocalDateTime, se não precisar de fuso horário
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,47 +17,42 @@ import java.util.List;
 @Table(name = "users")
 public class User {
 
+    @EqualsAndHashCode.Include // Incluir o ID no Equals e HashCode
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nome", nullable = false)
-    private String nome;
+    // Mapeando para 'full_name' no banco
+    @Column(name = "full_name", nullable = false)
+    private String fullName;
 
-    @Column(name = "email", nullable = false, unique = false)
+    // CORRIGIDO: unique = true
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    // --- Mapeamento de relacionamento One-to-many
-    @OneToMany(
-            mappedBy = "user", // campo da entidade
-            cascade = CascadeType.ALL, // propagar para a Tasks
-            orphanRemoval = true // deletar Task do banco de removida da lista
-    )
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private List<Task> tasks = new ArrayList<>();
 
+    // Mapeando para 'created_at' e CORRIGIDO: updatable = false
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private OffsetDateTime createdAt;
 
-    @Column(name = "criadoEm", nullable = false)
-    private OffsetDateTime criadoEm;
-
-    @Column(name = "atualizadoEm", nullable = false, updatable = false)
-    private OffsetDateTime atualizadoEm;
-
-
-    // gerando métodos - Ciclo de vioda JPA
+    // Mapeando para 'updated_at'
+    @Column(name = "updated_at", nullable = false)
+    private OffsetDateTime updatedAt;
 
     @PrePersist
-    protected void criacao() {
-        this.criadoEm = OffsetDateTime.now();
-        this.atualizadoEm = OffsetDateTime.now();
+    protected void onPersist() {
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
     }
 
     @PreUpdate
-    protected void atualizacao() {
-        this.atualizadoEm = OffsetDateTime.now();
+    protected void onUpdate() {
+        this.updatedAt = OffsetDateTime.now();
     }
 }
