@@ -42,7 +42,7 @@ public class JwtTokenProvider {
                 .subject(email) // Define o "dono" do token (no nosso caso, o e-mail).
                 .issuedAt(now) // Define a data de emissão.
                 .expiration(expiryDate) // Define a data de expiração.
-                .signWith(getSigningKey(), SignatureAlgorithm.HS512) // Assina com nossa chave secreta usando o algoritmo HS512.
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact(); // Constrói e serializa o token para uma String.
     }
 

@@ -15,15 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-// configuração de segurança
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private final AuthenticationConfiguration authenticationConfiguration;
-
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration) {
-        this.authenticationConfiguration = authenticationConfiguration;
-    }
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -33,25 +27,26 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // responsável por processar uma tentativa de autenticação.
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    // cadeia de filtros de segurança que será aplicada a cada requisição HTTP.
+    // CORREÇÃO PRINCIPAL: ADICIONANDO O @Bean E SIMPLIFICANDO
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // desabilitar o csrf(Cross-Site Request Forgery)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // configurar plítica de gerenciamento de sessões
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("api/v1/auth/**").permitAll()
+                        // Garantindo que esta rota seja pública
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        // Todas as outras rotas exigem autenticação
                         .anyRequest().authenticated()
                 );
 
+        // Adicionando nosso filtro JWT antes do filtro padrão
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
 
         return http.build();
     }
