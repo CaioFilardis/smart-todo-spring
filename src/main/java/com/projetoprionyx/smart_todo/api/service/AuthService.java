@@ -3,7 +3,8 @@ package com.projetoprionyx.smart_todo.api.service;
 import com.projetoprionyx.smart_todo.api.dto.auth.AuthResponseDto;
 import com.projetoprionyx.smart_todo.api.dto.auth.LoginRequestDto;
 import com.projetoprionyx.smart_todo.api.dto.auth.RegisterRequestDto;
-import org.springframework.security.authentication.jaas.LoginExceptionResolver;
+import org.springframework.stereotype.Service;
+
 
 public interface AuthService {
 
