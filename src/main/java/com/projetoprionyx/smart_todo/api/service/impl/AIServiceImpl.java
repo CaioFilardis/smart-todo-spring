@@ -1,6 +1,7 @@
 package com.projetoprionyx.smart_todo.api.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.projetoprionyx.smart_todo.api.dto.ai.AIPredictionDto;
 import com.projetoprionyx.smart_todo.api.service.AIService;
 import org.slf4j.Logger;
@@ -18,52 +19,75 @@ public class AIServiceImpl implements AIService {
     private static final Logger logger = LoggerFactory.getLogger(AIServiceImpl.class);
 
     private final ChatClient chatClient;
-    private final ObjectMapper objectMapper; // Ferramenta para converter JSON
+    private final ObjectMapper objectMapper;
     private final String promptTemplateString;
 
-    // Injetamos o ChatClient.Builder e o ObjectMapper via construtor
-    public AIServiceImpl(ChatClient.Builder chatClientBuilder, ObjectMapper objectMapper) {
+    public AIServiceImpl(ChatClient.Builder chatClientBuilder) {
         this.chatClient = chatClientBuilder.build();
-        this.objectMapper = objectMapper; // Armazenamos o ObjectMapper
+
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
 
         this.promptTemplateString = """
-            Analise a seguinte tarefa e forneça uma sugestão de prioridade e data de conclusão.
-            A data de hoje é: {currentDate}.
-
-            Título da Tarefa: {title}
-            Descrição da Tarefa: {description}
-
-            Responda APENAS com um objeto JSON válido, sem nenhum texto adicional antes ou depois.
-            O JSON deve ter duas chaves:
-            1. "priority": com um dos seguintes valores em maiúsculas: "HIGH", "MEDIUM", "LOW".
-            2. "dueDate": com a data sugerida no formato "YYYY-MM-DD".
-
-            Se a tarefa não tiver urgência ou data implícita, use a prioridade "LOW" e a data de hoje.
-            """;
+                Sua tarefa é analisar o título e a descrição de uma tarefa e retornar uma sugestão de prioridade e data de conclusão.
+                A data de hoje é: {currentDate}.
+                
+                Título da Tarefa: "{title}"
+                Descrição da Tarefa: "{description}"
+                
+                Responda APENAS com um objeto JSON válido, sem nenhum texto ou formatação adicional.
+                O JSON deve conter exatamente as seguintes chaves:
+                1. "priority": use um dos valores "HIGH", "MEDIUM", ou "LOW".
+                2. "dueDate": use o formato "YYYY-MM-DD".
+                
+                Analise o texto em busca de urgência (ex: "para hoje", "urgente", "crítico") e datas explícitas.
+                Se houver urgência detectada, use "HIGH".
+                Se nenhuma urgência for detectada, use "LOW".
+                
+                NÃO USE markdown (```) na resposta. Retorne APENAS o JSON puro.
+                """;
     }
 
     @Override
     public AIPredictionDto getTaskPrediction(String title, String description) {
-        PromptTemplate promptTemplate = new PromptTemplate(this.promptTemplateString);
-        Map<String, Object> promptValues = Map.of(
-                "currentDate", LocalDate.now().toString(),
-                "title", title,
-                "description", (description != null ? description : "N/A")
-        );
-
-        // 1. Faz a chamada e obtém a resposta como uma String de texto.
-        String jsonResponse = this.chatClient.prompt()
-                .messages(promptTemplate.createMessage(promptValues))
-                .call()
-                .content(); // <-- Usamos .content() para obter a String
-
-        // 2. Converte (parse) a String JSON para nosso objeto DTO.
         try {
-            return objectMapper.readValue(jsonResponse, AIPredictionDto.class);
+            logger.debug("Iniciando previsão de IA para tarefa: {}", title);
+
+            PromptTemplate promptTemplate = new PromptTemplate(this.promptTemplateString);
+
+            Map<String, Object> promptValues = Map.of(
+                    "currentDate", LocalDate.now().toString(),
+                    "title", title,
+                    "description", (description != null ? description : "Nenhuma")
+            );
+
+            String responseContent = this.chatClient
+                    .prompt(promptTemplate.create(promptValues))
+                    .call()
+                    .content();
+
+            logger.debug("Resposta recebida da IA (bruta): {}", responseContent);
+
+            String cleanedResponse = responseContent
+                    .replaceAll("(?is)```json\\s*(.*?)\\s*```", "$1") // Extrai conteúdo do bloco JSON
+                    .replaceAll("(?i)^\\s*json\\s*", "")             // Remove o prefixo "json\n" ou "json "
+                    .replaceAll("[`]+", "")                           // Remove backticks
+                    .trim();
+
+            logger.debug("Resposta limpa: {}", cleanedResponse);
+
+            try {
+                AIPredictionDto prediction = this.objectMapper.readValue(cleanedResponse, AIPredictionDto.class);
+                logger.debug("Previsão obtida: priority={}, dueDate={}", prediction.getPriority(), prediction.getDueDate());
+                return prediction;
+            } catch (Exception e) {
+                logger.error("Erro ao converter resposta JSON da IA: {}", cleanedResponse, e);
+                return new AIPredictionDto(null, LocalDate.now().plusDays(1));
+            }
+
         } catch (Exception e) {
-            logger.error("Falha ao converter a resposta JSON da IA: {}", jsonResponse, e);
-            // Retorna um valor padrão ou nulo em caso de erro de conversão.
-            return null;
+            logger.error("Erro ao chamar a API de IA", e);
+            return new AIPredictionDto(null, LocalDate.now().plusDays(1));
         }
     }
 }
