@@ -41,7 +41,11 @@
                 <span class="eye-toggle" id="toggleSenha">&#128065;</span>
                 <div id="senha-feedback" class="invalid-feedback"></div>
             </div>
-            <button type="submit" class="btn btn-primary w-100" id="btn-login">Entrar</button>
+            <button type="submit" class="btn btn-primary w-100 d-flex justify-content-center align-items-center gap-2" id="btn-login">
+                <span id="btn-login-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                <span id="btn-login-texto">Entrar</span>
+            </button>
+
         </form>
         <div id="login-error" class="alert alert-danger mt-3 d-none"></div>
         <div class="text-center mt-3">
@@ -49,6 +53,9 @@
         </div>
     </div>
 </div>
+
+<!-- bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -150,14 +157,38 @@
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         msg = xhr.responseJSON.message;
                     }
-                    $("#login-error").removeClass("d-none").text(msg);
+                    showStatusModal(msg);
                 },
                 complete: function() {
-                    $("#btn-login").prop("disabled", false).text("Entrar");
+                    $("#btn-login").prop("disabled", false);
+                    $("#btn-login-texto").text("Entrar");
+                    $("#btn-login-spinner").addClass("d-none");
                 }
             });
         });
+
+        // Função para exibir modal com mensagem
+        function showStatusModal(msg) {
+            $("#statusModalMessage").html(msg);
+            var myModal = new bootstrap.Modal(document.getElementById('statusModal'));
+            myModal.show();
+        }
     });
 </script>
+
+<!-- Modal Bootstrap para status -->
+<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:#22242A; color:#FFD580;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="statusModalLabel">Aviso</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body" id="statusModalMessage">
+                <!-- Mensagem será inserida via JS -->
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
