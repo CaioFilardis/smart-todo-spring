@@ -39,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
         }
         User user = new User();
         // Ajustar para o nome correto do campo na sua entidade User e DTO
-        // user.setFullName(registerRequestDto.getFullName());
+        user.setFullName(registerRequestDto.getFullName());
         user.setEmail(registerRequestDto.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequestDto.getPassword()));
         userRepository.save(user);
