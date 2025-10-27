@@ -3,27 +3,27 @@ package com.projetoprionyx.smart_todo.api.controller;
 import com.projetoprionyx.smart_todo.api.dto.auth.AuthResponseDto;
 import com.projetoprionyx.smart_todo.api.dto.auth.LoginRequestDto;
 import com.projetoprionyx.smart_todo.api.dto.auth.RegisterRequestDto;
+import com.projetoprionyx.smart_todo.api.repository.UserRepository;
 import com.projetoprionyx.smart_todo.api.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
     private final AuthService authService;
+    private final UserRepository userRepository;
 
     // Injeção por construtor (melhor prática)
     @Autowired
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, UserRepository userRepository) {
         this.authService = authService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/register")
@@ -36,5 +36,11 @@ public class AuthController {
     public ResponseEntity<AuthResponseDto> loginUser(@Valid @RequestBody LoginRequestDto loginRequestDto) {
         AuthResponseDto authResponseDto = authService.login(loginRequestDto);
         return ResponseEntity.ok(authResponseDto);
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        boolean exists = userRepository.existsByEmail(email);
+        return ResponseEntity.ok(exists);
     }
 }

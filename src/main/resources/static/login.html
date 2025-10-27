@@ -16,10 +16,13 @@
                 <img src="./img/Logo_Academia(300x300).svg" alt="Logo" class="mb-3" style="width:150px;" />
                 <h2 class="text-primary">Entrar</h2>
             </div>
-            <form>
+            <form id="login-form">
                 <div class="mb-3">
                     <label for="email" class="form-label">E-mail</label>
-                    <input type="email" class="form-control" id="email" placeholder="Seu e-mail" required>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Seu e-mail" required>
+                    <div id="email-feedback" class="invalid-feedback">
+                        Por favor, digite um e-mail válido.
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label for="senha" class="form-label">Senha</label>
@@ -32,5 +35,24 @@
             </div>
         </div>
     </div>
+
+  <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+            // Valor controlado em tempo real
+            $("#email").on("input", function() {
+                var emailValue = $(this).val();
+                const isValid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailValue);
+                if (!isValid && emailValue.length > 0) {
+                    $(this).addClass("is-invalid");
+                } else {
+                    $(this).removeClass("is-invalid");
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>
