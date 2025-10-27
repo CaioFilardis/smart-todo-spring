@@ -10,7 +10,7 @@ import lombok.Setter;
 public class TaskRequestDto {
 
     @NotBlank(message = "O título não pode estar em branco")
-    @Size(max = 25, message = "O título não pode exceder 255 caracteres.")
+    @Size(max = 255, message = "O título não pode exceder 255 caracteres.")
     private String title;
 
     @Size(max = 4000, message = "A descrição é muito longa.")
