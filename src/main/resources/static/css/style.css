@@ -1,0 +1,32 @@
+body {
+    background: #181A1B;
+    color: #F1F5F9;
+}
+.card {
+    border-radius: 10px;
+    background: #22242A !important;
+    color: #F1F5F9;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+.input, .form-control {
+    background: #181A1B !important;
+    color: #F1F5F9 !important;
+}
+.btn-primary {
+    background: #4F8EFF;
+    color: #181A1B;
+    font-weight: 600;
+}
+.btn-primary:hover {
+    background: #2563eb;
+    color: #fff;
+}
+.text-primary {
+    color: #4F8EFF !important;
+}
+.link-warning {
+    color: #FFD580 !important;
+}
+.link-warning:hover {
+    color: #F59E42 !important;
+}

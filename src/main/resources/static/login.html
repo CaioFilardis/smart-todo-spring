@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Smart Todo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css"> <!-- Seu CSS personalizado -->
+</head>
+<body>
+    <div class="container min-vh-100 d-flex justify-content-center align-items-center">
+        <div class="card p-4 shadow" style="min-width:320px;max-width:400px;background:#22242A;">
+            <div class="mb-4 text-center">
+                <!-- Logo SVG/Imagem -->
+                <img src="./img/Logo_Academia(300x300).svg" alt="Logo" class="mb-3" style="width:150px;" />
+                <h2 class="text-primary">Entrar</h2>
+            </div>
+            <form>
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input type="email" class="form-control" id="email" placeholder="Seu e-mail" required>
+                </div>
+                <div class="mb-3">
+                    <label for="senha" class="form-label">Senha</label>
+                    <input type="password" class="form-control" id="senha" placeholder="Sua senha" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Entrar</button>
+            </form>
+            <div class="text-center mt-3">
+                <a href="register.html" class="link-warning">Cadastrar conta</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
