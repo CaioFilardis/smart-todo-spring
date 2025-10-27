@@ -22,11 +22,6 @@ public class GlobalExceptionHandler {
         body.put("error", "Not Found");
         body.put("message", ex.getMessage());
         body.put("path", request.getDescription(false).replace("uri=", ""));
-<<<<<<< HEAD
-
-=======
-        
->>>>>>> 3d864ad105732719f81736f64c35e3a655229de1
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
@@ -39,11 +34,7 @@ public class GlobalExceptionHandler {
         body.put("error", "Conflict");
         body.put("message", ex.getMessage());
         body.put("path", request.getDescription(false).replace("uri=", ""));
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> 3d864ad105732719f81736f64c35e3a655229de1
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
@@ -56,14 +47,9 @@ public class GlobalExceptionHandler {
         body.put("error", "Internal Server Error");
         body.put("message", "An unexpected error occurred");
         body.put("path", request.getDescription(false).replace("uri=", ""));
-<<<<<<< HEAD
+
 
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
-=======
-        
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-}
->>>>>>> 3d864ad105732719f81736f64c35e3a655229de1
+
