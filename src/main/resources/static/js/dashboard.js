@@ -1,20 +1,19 @@
 async function carregarDashboard() {
     try {
-        // Chamar API (ajuste endpoint e adicione header Authorization se usar JWT)
         const response = await fetch('/api/v1/tasks', {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         });
         const tarefas = await response.json();
-
-        // Contadores e cards
-        document.getElementById('totalTasks').textContent = 'Total de Tarefas: ' + tarefas.length;
         const pendentes = tarefas.filter(t => t.status === 'PENDING').length;
-        document.getElementById('pendingTasks').textContent = 'Tarefas Pendentes: ' + pendentes;
+        const emProgresso = tarefas.filter(t => t.status === 'IN_PROGRESS').length;
         const concluidas = tarefas.filter(t => t.status === 'COMPLETED').length;
+
+        document.getElementById('totalTasks').textContent = 'Total de Tarefas: ' + tarefas.length;
+        document.getElementById('pendingTasks').textContent = 'Tarefas Pendentes: ' + pendentes;
+        document.getElementById('progressTasks').textContent = 'Tarefas em Progresso: ' + emProgresso;
         document.getElementById('completedTasks').textContent = 'Tarefas Concluídas: ' + concluidas;
 
-        // Tabela de tarefas
         const tbody = document.querySelector('#tasksTable tbody');
         tbody.innerHTML = '';
         tarefas.forEach(tarefa => {
@@ -35,5 +34,4 @@ async function carregarDashboard() {
     }
 }
 
-// Garante que rode após carregar a página
 window.onload = carregarDashboard;

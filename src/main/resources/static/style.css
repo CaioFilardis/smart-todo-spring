@@ -587,6 +587,10 @@ label {
     border-left: 6px solid #10b981;
 }
 
+.dashboard-card.progress {
+    border-left: 6px solid #FBBF24; /* amarelo ou outra cor para progresso */
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
