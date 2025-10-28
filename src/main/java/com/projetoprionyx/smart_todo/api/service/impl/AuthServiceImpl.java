@@ -37,6 +37,10 @@ public class AuthServiceImpl implements AuthService {
         if (userRepository.findByEmail(registerRequestDto.getEmail()).isPresent()) {
             throw new RuntimeException("Erro: O e-mail já está em uso!");
         }
+
+        if (!registerRequestDto.getPassword().equals(registerRequestDto.getConfirmPassword())) {
+            throw new RuntimeException("Erro: As senhas não conferem!");
+        }
         User user = new User();
         // Ajustar para o nome correto do campo na sua entidade User e DTO
         user.setFullName(registerRequestDto.getFullName());

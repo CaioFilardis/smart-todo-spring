@@ -23,4 +23,8 @@ public class RegisterRequestDto {
     @NotBlank(message = "A senha não pode estar em branco.")
     @Size(min = 8, message = "A senha deve ter no mínimo 8 caracteres.")
     private String password;
+
+    @NotBlank(message = "A confirmação de senha não pode estar em branco.")
+    @Size(min = 8, message = "A confirmação deve corresponder a senha anterior digitada.")
+    private String confirmPassword;
 }

@@ -13,9 +13,25 @@
         <input type="text" name="username" class="form-control" placeholder="Usuário" required>
         <input type="email" name="email" class="form-control" placeholder="Email" required>
         <input type="password" name="password" class="form-control" placeholder="Senha" required>
+        <input type="password" name="confirmPassword" class="form-control" placeholder="Confirmar senha" required>
+        <div class="alert alert-error" style="display:none;"></div>
         <button type="submit" class="btn btn-primary w-100 d-flex justify-content-center align-items-center gap-2">Cadastrar</button>
     </form>
     <a href="login.html">Já tem conta? Faça login.</a>
 </div>
+
+
+<script>
+    const form = document.querySelector('.login-form');
+    form.addEventListener('submit', function(e) {
+        const senha = form.querySelector('input[name="password"]').value;
+        const confirmar = form.querySelector('input[name="confirmPassword"]').value;
+        if (senha !== confirmar) {
+            e.preventDefault();
+            alert('As senhas não coincidem!');
+        }
+    });
+</script>
+
 </body>
 </html>
