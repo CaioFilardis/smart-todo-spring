@@ -209,26 +209,26 @@ label {
     body {
         padding: 16px;
     }
-    
+
     .card {
         padding: 28px 20px;
         border-radius: 12px;
     }
-    
+
     h1 {
         font-size: 24px;
     }
-    
+
     h2 {
         font-size: 20px;
     }
-    
+
     .input,
     .form-control {
         padding: 12px 14px;
         font-size: 16px; /* Evita zoom automático no iOS */
     }
-    
+
     .btn-primary {
         padding: 14px 20px;
         font-size: 16px;
@@ -239,11 +239,11 @@ label {
     body {
         padding: 12px;
     }
-    
+
     .card {
         padding: 24px 16px;
     }
-    
+
     h1 {
         font-size: 22px;
         margin-bottom: 20px;
@@ -453,4 +453,70 @@ label {
     background: rgba(16, 185, 129, 0.1);
     border: 1px solid rgba(16, 185, 129, 0.3);
     color: #6ee7b7;
+}
+
+/* ============================================
+   MODAL DE MENSAGEM
+   ============================================ */
+
+.modal {
+    position: absolute;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background: rgba(0,0,0,0.3);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+.modal.active {
+    display: flex;
+}
+.modal-content {
+    background: #22242A;
+    color: #F1F5F9;
+    padding: 32px 36px;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+    text-align: center;
+    min-width: 240px;
+    position: relative;
+}
+.close {
+    position: absolute;
+    right: 16px; top: 12px;
+    color: #ccc;
+    font-size: 28px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.close:hover { color: #fff; }
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    z-index: 1000;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.28);
+    flex-direction: column;
+    font-size: 18px;
+    color: #f1f5f9;
+    gap: 18px;
+}
+.spinner {
+    width: 44px;
+    height: 44px;
+    border: 4px solid #4F8EFF;
+    border-top: 4px solid #181A1B;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
 }

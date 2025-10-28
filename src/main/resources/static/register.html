@@ -3,7 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <title>Cadastro - Smart Todo</title>
-    <link rel="stylesheet" href="style.css"> <!-- Já está no projeto -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Adicione spinner e loading CSS aqui ou no seu style.css */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            z-index: 1000;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.28);
+            flex-direction: column;
+            font-size: 18px;
+            color: #f1f5f9;
+            gap: 18px;
+        }
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid #4F8EFF;
+            border-top: 4px solid #181A1B;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg);}
+            100% { transform: rotate(360deg);}
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -12,34 +40,60 @@
         <input type="text" name="fullName" class="form-control" placeholder="Nome completo" required>
         <input type="email" name="email" class="form-control" placeholder="Email" required>
         <input type="password" name="password" class="form-control" placeholder="Senha" required>
+        <div id="password-strength" class="password-strength-text"></div>
         <input type="password" name="confirmPassword" class="form-control" placeholder="Confirmar senha" required>
         <div class="alert alert-error" style="display:none;"></div>
+        <div class="alert alert-success" style="display:none;"></div>
         <button type="submit" class="btn btn-primary w-100 d-flex justify-content-center align-items-center gap-2">Cadastrar</button>
     </form>
     <a href="login.html">Já tem conta? Faça login.</a>
 </div>
 
+<!-- Modal de Sucesso -->
+<div id="successModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <p>Usuário cadastrado!</p>
+    </div>
+</div>
+
+<!-- Loading -->
+<div id="loading" class="loading" style="display: none;">
+    <div class="spinner"></div>
+    <span>Aguarde, processando cadastro...</span>
+</div>
 
 <script>
-    document.getElementById('registerForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // evita envio padrão
+    const registerForm = document.getElementById('registerForm');
+    const modal = document.getElementById("successModal");
+    const closeBtn = document.getElementById("closeModal");
+    const loading = document.getElementById('loading');
 
-        const form = e.target;
-        const senha = form.password.value;
-        const confirmar = form.confirmPassword.value;
+    registerForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const errorBox = document.querySelector('.alert-error');
+        const successBox = document.querySelector('.alert-success');
+        errorBox.style.display = "none";
+        successBox.style.display = "none";
+
+        const senha = registerForm.password.value;
+        const confirmar = registerForm.confirmPassword.value;
+        const submitBtn = registerForm.querySelector('button[type="submit"]'); // Botão submit
 
         if (senha !== confirmar) {
-            // Mostra mensagem visual opcional
-            alert('As senhas não coincidem!');
+            errorBox.textContent = 'As senhas não coincidem!';
+            errorBox.style.display = "block";
             return;
         }
-
         const data = {
-            fullName: form.fullName.value,
-            email: form.email.value,
+            fullName: registerForm.fullName.value,
+            email: registerForm.email.value,
             password: senha,
             confirmPassword: confirmar
         };
+
+        submitBtn.disabled = true;
+        loading.style.display = "flex"; // Mostra loading
 
         fetch('/api/v1/auth/register', {
             method: 'POST',
@@ -49,20 +103,44 @@
             body: JSON.stringify(data)
         })
             .then(async response => {
+                loading.style.display = "none"; // Esconde loading quando acaba
+                submitBtn.disabled = false;
+
                 if (response.ok) {
-                    alert("Usuário cadastrado!");
-                    window.location.href = "login.html";
+                    successBox.textContent = "Usuário cadastrado com sucesso!";
+                    successBox.style.display = "block";
+                    setTimeout(() => {
+                        successBox.style.display = "none";
+                        window.location.href = "login.html";
+                    }, 2000);
                 } else {
                     const res = await response.json();
-                    alert("Erro: " + (res.message || "Cadastro falhou!"));
+                    errorBox.textContent = res.message || "Cadastro falhou!";
+                    errorBox.style.display = "block";
+                    setTimeout(() => { errorBox.style.display = "none"; }, 4000);
                 }
             })
             .catch(error => {
-                alert("Erro: " + error.message);
+                loading.style.display = "none";
+                errorBox.textContent = "Erro: " + error.message;
+                errorBox.style.display = "block";
+                setTimeout(() => { errorBox.style.display = "none"; }, 4000);
             });
     });
 
-</script>
+    // Fechar modal clicando no botão X
+    closeBtn.onclick = function() {
+        modal.classList.remove('active');
+        window.location.href = "login.html";
+    };
 
+    // Fechar modal clicando fora do modal-content
+    modal.onclick = function(e) {
+        if (e.target === modal) {
+            modal.classList.remove('active');
+            window.location.href = "login.html";
+        }
+    };
+</script>
 </body>
 </html>
