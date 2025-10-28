@@ -582,6 +582,11 @@ label {
     min-width: 160px;
     margin-bottom: 18px;
 }
+
+.dashboard-card.completed {
+    border-left: 6px solid #10b981;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
