@@ -1,9 +1,18 @@
 async function carregarDashboard() {
     try {
+        const token = localStorage.getItem('token');
         const response = await fetch('/api/v1/tasks', {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token // Necessário para autenticação!
+            }
         });
+
+        if (response.status === 403) {
+            window.location.href = "login.html"; // Redireciona pra login se não autenticado
+            return;
+        }
         const tarefas = await response.json();
         const pendentes = tarefas.filter(t => t.status === 'PENDING').length;
         const emProgresso = tarefas.filter(t => t.status === 'IN_PROGRESS').length;
