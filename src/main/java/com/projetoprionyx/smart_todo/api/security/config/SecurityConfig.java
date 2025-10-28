@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         // Garantindo que esta rota seja pública
-                        .requestMatchers("/api/v1/auth/**", "/login.html", "/register.html", "/style.css", "/js/**", "/img/**", "/", "/").permitAll()
+                        .requestMatchers("/api/v1/auth/**", "/login.html", "/register.html", "/style.css", "/js/**", "/img/**", "/dashboard.html", "/").permitAll()
                         // Todas as outras rotas exigem autenticação
                         .anyRequest().authenticated()
                 );
