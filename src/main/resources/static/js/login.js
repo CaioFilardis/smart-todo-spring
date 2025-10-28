@@ -35,7 +35,7 @@ $(document).ready(function(){
                 password: senha
             }),
             success: function(response) {
-                localStorage.setItem("token", response.token);
+                localStorage.setItem("token", response.accessToken);
                 window.location.href = "dashboard.html";
             },
             error: function(xhr) {
