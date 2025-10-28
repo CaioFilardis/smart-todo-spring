@@ -140,6 +140,164 @@ body {
     color: #F59E42 !important;
     text-decoration: underline;
     transform: translateX(2px);
+<<<<<<< HEAD
+=======
+}
+
+a {
+    color: #4F8EFF;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #6fa3ff;
+    text-decoration: underline;
+}
+
+/* ============================================
+   TÍTULOS E LABELS
+   ============================================ */
+h1, h2, h3, h4, h5, h6 {
+    color: #F1F5F9;
+    font-weight: 600;
+    margin-bottom: 16px;
+    line-height: 1.3;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 24px;
+}
+
+h2 {
+    font-size: 24px;
+}
+
+label {
+    display: block;
+    color: #CBD5E1;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+}
+
+/* ============================================
+   ESPAÇAMENTOS E MARGENS
+   ============================================ */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.mt-3 {
+    margin-top: 16px;
+}
+
+.mb-3 {
+    margin-bottom: 16px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* ============================================
+   RESPONSIVIDADE MOBILE
+   ============================================ */
+@media (max-width: 768px) {
+    body {
+        padding: 16px;
+    }
+    
+    .card {
+        padding: 28px 20px;
+        border-radius: 12px;
+    }
+    
+    h1 {
+        font-size: 24px;
+    }
+    
+    h2 {
+        font-size: 20px;
+    }
+    
+    .input,
+    .form-control {
+        padding: 12px 14px;
+        font-size: 16px; /* Evita zoom automático no iOS */
+    }
+    
+    .btn-primary {
+        padding: 14px 20px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 12px;
+    }
+    
+    .card {
+        padding: 24px 16px;
+    }
+    
+    h1 {
+        font-size: 22px;
+        margin-bottom: 20px;
+    }
+}
+
+/* ============================================
+   MELHORIAS DE ACESSIBILIDADE
+   ============================================ */
+*:focus-visible {
+    outline: 2px solid #4F8EFF;
+    outline-offset: 2px;
+}
+
+/* ============================================
+   ANIMAÇÕES E TRANSIÇÕES
+   ============================================ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* ============================================
+   MENSAGENS DE ERRO E SUCESSO
+   ============================================ */
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+}
+
+.alert-success {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #6ee7b7;
+>>>>>>> dfa84827fbedf62411a5c7017f286ee9e018ae8a
 }
 
 a {
