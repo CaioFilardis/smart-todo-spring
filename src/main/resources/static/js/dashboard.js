@@ -5,12 +5,12 @@ async function carregarDashboard() {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token // Necessário para autenticação!
+                'Authorization': 'Bearer ' + token
             }
         });
 
         if (response.status === 403) {
-            window.location.href = "login.html"; // Redireciona pra login se não autenticado
+            window.location.href = "login.html";
             return;
         }
         const tarefas = await response.json();
@@ -43,4 +43,104 @@ async function carregarDashboard() {
     }
 }
 
-window.onload = carregarDashboard;
+// Handlers para modal e criação de tarefa
+window.onload = function() {
+    async function carregarPerfilUsuario() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = "login.html";
+            return;
+        }
+        const response = await fetch('/api/v1/auth/me', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        });
+        if (response.ok) {
+            const usuario = await response.json();
+            // Atualiza HTML do avatar/nome
+            document.getElementById('userNome').textContent = usuario.fullName;
+            document.getElementById('userEmail').textContent = usuario.email;
+            // Se for usar avatar:
+            //document.getElementById('userAvatar').src = usuario.avatarUrl || 'default-avatar.png';
+        }
+    }
+
+    carregarPerfilUsuario();
+
+    // define handlers UMA vez só!
+    document.getElementById('btnNovaTarefa').onclick = function() {
+        document.getElementById('novaTarefaModal').style.display = 'flex';
+    };
+    document.getElementById('closeNovaTarefa').onclick = function() {
+        document.getElementById('novaTarefaModal').style.display = 'none';
+    };
+
+    document.getElementById('formNovaTarefa').onsubmit = async function(e) {
+        e.preventDefault();
+        const token = localStorage.getItem('token');
+        const form = e.target;
+        const data = {
+            title: form.title.value,
+            description: form.description.value,
+            priority: form.priority.value
+        };
+        const response = await fetch('/api/v1/tasks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(data)
+        });
+        if (response.ok) {
+            document.getElementById('novaTarefaModal').style.display = 'none';
+            carregarDashboard();
+        } else {
+            alert('Erro ao criar tarefa');
+        }
+    };
+
+    // Só então carrega dados do dashboard!
+    carregarDashboard();
+
+    document.getElementById('btnConversaIA').onclick = function() {
+        document.getElementById('modalConversaIA').style.display = 'flex';
+        document.getElementById('chatMensagens').innerHTML = "";
+    };
+    document.getElementById('closeConversaIA').onclick = function() {
+        document.getElementById('modalConversaIA').style.display = 'none';
+    };
+
+    document.getElementById('formConversaIA').onsubmit = async function(e) {
+        e.preventDefault();
+        const token = localStorage.getItem('token');
+        const mensagem = document.getElementById('inputMsgIA').value;
+        const chatMensagens = document.getElementById('chatMensagens');
+
+        // Adiciona mensagem do usuário no chat
+        chatMensagens.innerHTML += `<div style="text-align:right; color:#FFD580;">Você: ${mensagem}</div>`;
+
+        // Chama backend GeminiController
+        const response = await fetch('/api/v1/gemini', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ message: mensagem })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            chatMensagens.innerHTML += `<div style="color:#6EE7B7;">IA: ${data.reply || data.content}</div>`;
+        } else {
+            chatMensagens.innerHTML += `<div style="color:#EF4444;">Erro na conversa com IA</div>`;
+        }
+
+        document.getElementById('inputMsgIA').value = "";
+    };
+
+};
