@@ -35,6 +35,7 @@ async function carregarDashboard() {
                 <td>
                     <button class="btn-primary" data-id="${tarefa.id}">Visualizar</button>
                     <button class="btn-edit" data-id="${tarefa.id}">Editar</button>
+                    ${tarefa.status == 'PENDING' ? `<button class="btn-concluir" data-id="${tarefa.id}">Concluir</button>` : ''}
                 </td>
             `;
             tbody.appendChild(tr);
@@ -44,6 +45,29 @@ async function carregarDashboard() {
                 const id = this.getAttribute('data-id');
                 window.location.href = `editar-tarefa.html?id=${id}`;
             };
+
+            const btnConcluir = tr.querySelector('.btn-concluir');
+            if (btnConcluir) {
+                btnConcluir.onclick = async function() {
+                    const id = this.getAttribute('data-id');
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`/api/v1/tasks/${id}/status`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify({ status: 'COMPLETED' })
+                    });
+                    if (response.ok) {
+                        alert('Tarefa marcada como concluída!');
+                        carregarDashboard();
+                    } else {
+                        alert('Erro ao concluir tarefa');
+                    }
+                };
+            }
+
         });
     } catch (err) {
         alert('Erro ao carregar tarefas');
@@ -70,8 +94,6 @@ window.onload = function() {
             // Atualiza HTML do avatar/nome
             document.getElementById('userNome').textContent = usuario.fullName;
             document.getElementById('userEmail').textContent = usuario.email;
-            // Se for usar avatar:
-            //document.getElementById('userAvatar').src = usuario.avatarUrl || 'default-avatar.png';
         }
     }
 

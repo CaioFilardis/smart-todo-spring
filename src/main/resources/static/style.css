@@ -120,6 +120,26 @@ body {
     transform: none;
 }
 
+.btn-concluir {
+    background: #38b000;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 15px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+.btn-concluir:hover {
+    background: #258400;
+}
+.btn-concluir::after {
+    content: " ✔";
+    font-size: 1.2em;
+    color: #fff;
+}
+
+
 /* ============================================
    LINKS E TEXTO
    ============================================ */
