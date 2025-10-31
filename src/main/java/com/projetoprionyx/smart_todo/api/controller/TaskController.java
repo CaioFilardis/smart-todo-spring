@@ -3,6 +3,8 @@ package com.projetoprionyx.smart_todo.api.controller;
 import com.projetoprionyx.smart_todo.api.dto.task.TaskRequestDto;
 import com.projetoprionyx.smart_todo.api.dto.task.TaskResponseDto;
 import com.projetoprionyx.smart_todo.api.dto.task.TaskStatusUpdateDto;
+import com.projetoprionyx.smart_todo.api.model.Task;
+import com.projetoprionyx.smart_todo.api.model.enums.TaskStatus;
 import com.projetoprionyx.smart_todo.api.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,13 @@ public class TaskController {
     public ResponseEntity<TaskResponseDto> getTaskById(@PathVariable Long taskId) {
         TaskResponseDto task = taskService.findTaskById(taskId);
         return ResponseEntity.ok(task);
+    }
+
+    public ResponseEntity<List<Task>> listarTarefas(@RequestParam(required = false) TaskStatus status) {
+        if (status != null) {
+            return ResponseEntity.ok(taskService.findTaskByStatus(status));
+        }
+        return null;
     }
 
     @PatchMapping("/{taskId}/status")

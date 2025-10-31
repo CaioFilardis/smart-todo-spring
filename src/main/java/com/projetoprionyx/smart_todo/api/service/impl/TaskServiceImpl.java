@@ -86,6 +86,12 @@ public class TaskServiceImpl implements TaskService {
         return convertToDto(task);
     }
 
+    @Transactional
+    public List<Task> listarPorStatus(TaskStatus status) {
+        return taskRepository.findByStatus(status);
+    }
+
+
     @Override
     @Transactional
     public TaskResponseDto updateTaskStatus(Long taskId, TaskStatus newStatus) {
