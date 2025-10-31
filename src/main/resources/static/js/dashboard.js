@@ -36,6 +36,7 @@ async function carregarDashboard() {
                     <button class="btn-primary" data-id="${tarefa.id}">Visualizar</button>
                     <button class="btn-edit" data-id="${tarefa.id}">Editar</button>
                     ${tarefa.status == 'PENDING' ? `<button class="btn-concluir" data-id="${tarefa.id}">Concluir</button>` : ''}
+                    <button class="btn-delete" data-id="${tarefa.id}">Excluir</button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -46,6 +47,7 @@ async function carregarDashboard() {
                 window.location.href = `editar-tarefa.html?id=${id}`;
             };
 
+            // concluir
             const btnConcluir = tr.querySelector('.btn-concluir');
             if (btnConcluir) {
                 btnConcluir.onclick = async function() {
@@ -68,7 +70,33 @@ async function carregarDashboard() {
                 };
             }
 
+            // excluir
+                    const btnDelete = tr.querySelector('.btn-delete');
+                    if (btnDelete) {
+                        btnDelete.onclick = async function() {
+                            const id = this.getAttribute('data-id');
+                            if (confirm('Tem certeza que deseja apagar esta tarefa?')) {
+                                const token = localStorage.getItem('token');
+                                const response = await fetch(`api/v1/tasks/${id}`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Authorization': 'Bearer ' + token
+                                    }
+                                });
+                                if (response.status == 204) {
+                                    alert('Tarefa excluída com sucesso');
+                                    carregarDashboard();
+                                } else {
+                                    alert('Erro ao excluir tarefa.');
+                                }
+                            }
+                        }
+                    }
+
         });
+
+
+
     } catch (err) {
         alert('Erro ao carregar tarefas');
     }
