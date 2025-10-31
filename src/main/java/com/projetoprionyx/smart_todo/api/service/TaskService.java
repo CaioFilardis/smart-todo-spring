@@ -20,6 +20,9 @@ public interface TaskService {
     // Atualiza o status de uma tarefa existente.
     TaskResponseDto updateTaskStatus(Long taskId, TaskStatus newStatus);
 
+    // Atualizar tarefa
+    TaskResponseDto updateTask(Long taskId, TaskRequestDto dto);
+
     // Deleta uma tarefa, verificando se ela pertence ao usuário logado.
     void deleteTask(Long taskId);
 }

@@ -103,6 +103,22 @@ public class TaskServiceImpl implements TaskService {
         return convertToDto(updatedTask);
     }
 
+
+    public TaskResponseDto updateTask(Long taskId, TaskRequestDto dto) {
+        User currentUser = getCurrentUser();
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new RuntimeException(("Tarefa não encontrada com id: " + taskId)));
+        if (!task.getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Acesso negado. A tarefa não pertence a este usuario");
+        }
+        task.setTitle(dto.getTitle());
+        task.setDescription(dto.getDescription());
+        task.setPriority(dto.getPriority());
+        Task updated = taskRepository.save(task);
+        return convertToDto(updated);
+    }
+
+
+
     @Override
     @Transactional
     public void deleteTask(Long taskId) {

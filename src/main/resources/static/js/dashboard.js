@@ -34,9 +34,16 @@ async function carregarDashboard() {
                 <td>${new Date(tarefa.createdAt).toLocaleDateString()}</td>
                 <td>
                     <button class="btn-primary" data-id="${tarefa.id}">Visualizar</button>
+                    <button class="btn-edit" data-id="${tarefa.id}">Editar</button>
                 </td>
             `;
             tbody.appendChild(tr);
+
+            // Aqui você adiciona o handler de clique APÓS adicionar o tr
+            tr.querySelector('.btn-edit').onclick = function() {
+                const id = this.getAttribute('data-id');
+                window.location.href = `editar-tarefa.html?id=${id}`;
+            };
         });
     } catch (err) {
         alert('Erro ao carregar tarefas');

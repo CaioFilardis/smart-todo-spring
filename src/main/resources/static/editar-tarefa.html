@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Editar Tarefa</title>
+    <link rel="stylesheet" href="style.css"></link>
+</head>
+<body>
+    <h2>Editar Tarefa</h2>
+    <form id="formEditarTarefa">
+        <input type="text" name="title" id="title" required></input>
+        <textarea name="description" id="description"></textarea>
+        <select name="priority" id="priority">
+            <option value="LOW">Prioridade</option>
+            <option value="MEDIUM">Média</option>
+            <option value="HIGH">Alta</option>
+        </select>
+        <button type="submit" class="btn btn-pimary">Salvar Alterações</button>
+    </form>
+
+    <!-- Scritp -->
+    <script src="./js/editar-tarefa.js"></script>
+</body>
+</html>

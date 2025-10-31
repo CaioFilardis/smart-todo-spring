@@ -1,5 +1,6 @@
 package com.projetoprionyx.smart_todo.api.dto.task;
 
+import com.projetoprionyx.smart_todo.api.model.enums.TaskPriority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -15,4 +16,6 @@ public class TaskRequestDto {
 
     @Size(max = 4000, message = "A descrição é muito longa.")
     private String description;
+
+    private TaskPriority priority;
 }
