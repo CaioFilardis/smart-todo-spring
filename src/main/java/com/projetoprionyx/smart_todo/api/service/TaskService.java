@@ -18,7 +18,7 @@ public interface TaskService {
     // Busca uma tarefa específica pelo seu ID, verificando se ela pertence ao usuário logado.
     TaskResponseDto findTaskById(Long id);
 
-    TaskResponseDto findTaskByStatus(TaskStatus status);
+    List<TaskResponseDto> findTaskByStatus(TaskStatus status);
 
     // Atualiza o status de uma tarefa existente.
     TaskResponseDto updateTaskStatus(Long taskId, TaskStatus newStatus);
@@ -31,5 +31,4 @@ public interface TaskService {
 
     // Buscar tarefa pelo título ou descrição
     List<TaskResponseDto> searchTaskByText(String text);
-
 }

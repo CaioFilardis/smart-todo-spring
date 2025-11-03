@@ -1,3 +1,85 @@
+// NOVO: Função de renderização, extraída e melhorada para ser reutilizável.
+// Ela agora contém a lógica completa, incluindo os botões.
+function renderTarefas(tarefas) {
+    const tbody = document.querySelector('#tasksTable tbody');
+    tbody.innerHTML = ''; // Limpa a tabela
+
+    tarefas.forEach(tarefa => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${tarefa.title}</td>
+            <td>${tarefa.status}</td>
+            <td>${tarefa.priority}</td>
+            <td>${new Date(tarefa.createdAt).toLocaleDateString()}</td>
+            <td>
+                <button class="btn-primary" data-id="${tarefa.id}">Visualizar</button>
+                <button class="btn-edit" data-id="${tarefa.id}">Editar</button>
+                ${tarefa.status == 'PENDING' ? `<button class="btn-concluir" data-id="${tarefa.id}">Concluir</button>` : ''}
+                <button class="btn-delete" data-id="${tarefa.id}">Excluir</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+
+        // --- Adiciona os handlers de clique para os botões desta linha ---
+
+        // Handler de Editar
+        tr.querySelector('.btn-edit').onclick = function() {
+            const id = this.getAttribute('data-id');
+            window.location.href = `editar-tarefa.html?id=${id}`;
+        };
+
+        // Handler de Concluir
+        const btnConcluir = tr.querySelector('.btn-concluir');
+        if (btnConcluir) {
+            btnConcluir.onclick = async function() {
+                const id = this.getAttribute('data-id');
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/v1/tasks/${id}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ status: 'COMPLETED' })
+                });
+                if (response.ok) {
+                    alert('Tarefa marcada como concluída!');
+                    carregarDashboard(); // Recarrega tudo (estatísticas e tabela)
+                } else {
+                    alert('Erro ao concluir tarefa');
+                }
+            };
+        }
+
+        // Handler de Excluir
+        const btnDelete = tr.querySelector('.btn-delete');
+        if (btnDelete) {
+            btnDelete.onclick = async function() {
+                const id = this.getAttribute('data-id');
+                if (confirm('Tem certeza que deseja apagar esta tarefa?')) {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`api/v1/tasks/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    });
+                    if (response.status == 204) {
+                        alert('Tarefa excluída com sucesso');
+                        carregarDashboard(); // Recarrega tudo (estatísticas e tabela)
+                    } else {
+                        alert('Erro ao excluir tarefa.');
+                    }
+                }
+            }
+        }
+        
+        // TODO: Adicionar handler para o botão 'Visualizar'
+        
+    });
+}
+
+
 async function carregarDashboard() {
     try {
         const token = localStorage.getItem('token');
@@ -18,84 +100,14 @@ async function carregarDashboard() {
         const emProgresso = tarefas.filter(t => t.status === 'IN_PROGRESS').length;
         const concluidas = tarefas.filter(t => t.status === 'COMPLETED').length;
 
+        // Atualiza estatísticas
         document.getElementById('totalTasks').textContent = 'Total de Tarefas: ' + tarefas.length;
         document.getElementById('pendingTasks').textContent = 'Tarefas Pendentes: ' + pendentes;
         document.getElementById('progressTasks').textContent = 'Tarefas em Progresso: ' + emProgresso;
         document.getElementById('completedTasks').textContent = 'Tarefas Concluídas: ' + concluidas;
 
-        const tbody = document.querySelector('#tasksTable tbody');
-        tbody.innerHTML = '';
-        tarefas.forEach(tarefa => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${tarefa.title}</td>
-                <td>${tarefa.status}</td>
-                <td>${tarefa.priority}</td>
-                <td>${new Date(tarefa.createdAt).toLocaleDateString()}</td>
-                <td>
-                    <button class="btn-primary" data-id="${tarefa.id}">Visualizar</button>
-                    <button class="btn-edit" data-id="${tarefa.id}">Editar</button>
-                    ${tarefa.status == 'PENDING' ? `<button class="btn-concluir" data-id="${tarefa.id}">Concluir</button>` : ''}
-                    <button class="btn-delete" data-id="${tarefa.id}">Excluir</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-
-            // Aqui você adiciona o handler de clique APÓS adicionar o tr
-            tr.querySelector('.btn-edit').onclick = function() {
-                const id = this.getAttribute('data-id');
-                window.location.href = `editar-tarefa.html?id=${id}`;
-            };
-
-            // concluir
-            const btnConcluir = tr.querySelector('.btn-concluir');
-            if (btnConcluir) {
-                btnConcluir.onclick = async function() {
-                    const id = this.getAttribute('data-id');
-                    const token = localStorage.getItem('token');
-                    const response = await fetch(`/api/v1/tasks/${id}/status`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: JSON.stringify({ status: 'COMPLETED' })
-                    });
-                    if (response.ok) {
-                        alert('Tarefa marcada como concluída!');
-                        carregarDashboard();
-                    } else {
-                        alert('Erro ao concluir tarefa');
-                    }
-                };
-            }
-
-            // excluir
-                    const btnDelete = tr.querySelector('.btn-delete');
-                    if (btnDelete) {
-                        btnDelete.onclick = async function() {
-                            const id = this.getAttribute('data-id');
-                            if (confirm('Tem certeza que deseja apagar esta tarefa?')) {
-                                const token = localStorage.getItem('token');
-                                const response = await fetch(`api/v1/tasks/${id}`, {
-                                    method: 'DELETE',
-                                    headers: {
-                                        'Authorization': 'Bearer ' + token
-                                    }
-                                });
-                                if (response.status == 204) {
-                                    alert('Tarefa excluída com sucesso');
-                                    carregarDashboard();
-                                } else {
-                                    alert('Erro ao excluir tarefa.');
-                                }
-                            }
-                        }
-                    }
-
-        });
-
-
+        // MODIFICADO: Chama a nova função de renderização
+        renderTarefas(tarefas);
 
     } catch (err) {
         alert('Erro ao carregar tarefas');
@@ -127,14 +139,24 @@ window.onload = function() {
 
     carregarPerfilUsuario();
 
-    // define handlers UMA vez só!
+    // Handlers dos Modais (Nova Tarefa e IA)
     document.getElementById('btnNovaTarefa').onclick = function() {
         document.getElementById('novaTarefaModal').style.display = 'flex';
     };
     document.getElementById('closeNovaTarefa').onclick = function() {
         document.getElementById('novaTarefaModal').style.display = 'none';
     };
+    
+    document.getElementById('btnConversaIA').onclick = function() {
+        document.getElementById('modalConversaIA').style.display = 'flex';
+        document.getElementById('chatMensagens').innerHTML = "";
+    };
+    document.getElementById('closeConversaIA').onclick = function() {
+        document.getElementById('modalConversaIA').style.display = 'none';
+    };
 
+
+    // Handler do Formulário de Nova Tarefa
     document.getElementById('formNovaTarefa').onsubmit = async function(e) {
         e.preventDefault();
         const token = localStorage.getItem('token');
@@ -154,33 +176,21 @@ window.onload = function() {
         });
         if (response.ok) {
             document.getElementById('novaTarefaModal').style.display = 'none';
-            carregarDashboard();
+            carregarDashboard(); // Recarrega tudo
         } else {
             alert('Erro ao criar tarefa');
         }
     };
-
-    // Só então carrega dados do dashboard!
-    carregarDashboard();
-
-    document.getElementById('btnConversaIA').onclick = function() {
-        document.getElementById('modalConversaIA').style.display = 'flex';
-        document.getElementById('chatMensagens').innerHTML = "";
-    };
-    document.getElementById('closeConversaIA').onclick = function() {
-        document.getElementById('modalConversaIA').style.display = 'none';
-    };
-
+    
+    // Handler do Formulário de Chat IA
     document.getElementById('formConversaIA').onsubmit = async function(e) {
         e.preventDefault();
         const token = localStorage.getItem('token');
         const mensagem = document.getElementById('inputMsgIA').value;
         const chatMensagens = document.getElementById('chatMensagens');
 
-        // Adiciona mensagem do usuário no chat
         chatMensagens.innerHTML += `<div style="text-align:right; color:#FFD580;">Você: ${mensagem}</div>`;
 
-        // Chama backend GeminiController
         const response = await fetch('/api/v1/google-gemini/chat', {
             method: 'POST',
             headers: {
@@ -196,11 +206,33 @@ window.onload = function() {
         } else {
             chatMensagens.innerHTML += `<div style="color:#EF4444;">Erro na conversa com IA</div>`;
         }
-
         document.getElementById('inputMsgIA').value = "";
     };
 
+    // NOVO: Handler do botão de Busca
+    document.getElementById('btnBuscaTask').onclick = async function() {
+        const token = localStorage.getItem('token');
+        const searchTerm = document.getElementById('inputBuscaTask').value;
+        
+        // Consulta ao endpoint /search do backend
+        const response = await fetch(`/api/v1/tasks/search?term=${encodeURIComponent(searchTerm)}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        });
+        
+        if (response.ok) {
+            const tarefasFiltradas = await response.json();
+            // Renderiza apenas as tarefas filtradas
+            renderTarefas(tarefasFiltradas);
+            // Nota: A busca não atualiza os contadores de estatísticas (propositalmente)
+        } else {
+            alert('Erro na busca de tarefas');
+        }
+    };
+
+    // Carrega os dados iniciais do dashboard
+    carregarDashboard();
 };
-
-
-

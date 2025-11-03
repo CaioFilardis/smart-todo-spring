@@ -11,13 +11,10 @@ import com.projetoprionyx.smart_todo.api.repository.UserRepository;
 import com.projetoprionyx.smart_todo.api.service.AIService;
 import com.projetoprionyx.smart_todo.api.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,9 +30,6 @@ public class TaskServiceImpl implements TaskService {
 
     @Autowired
     private AIService aiService;
-
-    @Autowired
-    private TaskService taskService;
 
     @Override
     @Transactional
@@ -93,13 +87,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskResponseDto findTaskByStatus(TaskStatus status) {
-        return null;
+    public List<TaskResponseDto> findTaskByStatus(TaskStatus status) {
+        User currentUser = getCurrentUser();
+        // Você precisa criar o método findByUserIdAndStatus no seu TaskRepository
+        return taskRepository.findByUserIdAndStatus(currentUser.getId(), status).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public List<Task> listarPorStatus(TaskStatus status) {
-        return taskRepository.findByStatus(status);
+    public List<Task> listarPorStatus(Long taskId, TaskStatus status) {
+        return taskRepository.findByUserIdAndStatus(taskId, status);
     }
 
 
@@ -152,15 +150,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskResponseDto> searchTaskByText(String text) {
-        return List.of();
+        User currentUser = getCurrentUser();
+        // Você precisa criar o método customizado no Repository
+        return taskRepository.searchByTitleOrDescriptionForUser(currentUser.getId(), text).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
-
-
-    public ResponseEntity<List<TaskResponseDto>> searchTaskByTitleOrDescription(@RequestParam String text) {
-        List<TaskResponseDto> tasks = taskService.searchTaskByText(text);
-        return ResponseEntity.ok(tasks);
-    }
-
 
 
     /**

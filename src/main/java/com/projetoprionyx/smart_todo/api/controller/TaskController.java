@@ -3,8 +3,7 @@ package com.projetoprionyx.smart_todo.api.controller;
 import com.projetoprionyx.smart_todo.api.dto.task.TaskRequestDto;
 import com.projetoprionyx.smart_todo.api.dto.task.TaskResponseDto;
 import com.projetoprionyx.smart_todo.api.dto.task.TaskStatusUpdateDto;
-import com.projetoprionyx.smart_todo.api.model.Task;
-import com.projetoprionyx.smart_todo.api.model.enums.TaskStatus;
+import com.projetoprionyx.smart_todo.api.model.enums.TaskStatus; // Import necessário
 import com.projetoprionyx.smart_todo.api.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +38,20 @@ public class TaskController {
         return ResponseEntity.ok(task);
     }
 
-    public ResponseEntity<List<Task>> listarTarefas(@RequestParam(required = false) TaskStatus status) {
-        if (status != null) {
-            return ResponseEntity.ok((List<Task>) taskService.findTaskByStatus(status));
-        }
-        return null;
+    // CORRIGIDO: Adicionado @GetMapping para o endpoint de busca por status
+    @GetMapping(params = "status") // Será ativado se o parâmetro 'status' estiver presente
+    public ResponseEntity<List<TaskResponseDto>> listarTarefasPorStatus(@RequestParam TaskStatus status) {
+        // Você precisa implementar a lógica em TaskServiceImpl para converter para DTO
+        List<TaskResponseDto> tasks = taskService.findTaskByStatus(status);
+        return ResponseEntity.ok(tasks);
+    }
+
+    // CORRIGIDO: Adicionado @GetMapping para o endpoint de busca por texto
+    @GetMapping("/search") // Endpoint que o seu frontend estava tentando chamar
+    public ResponseEntity<List<TaskResponseDto>> searchTasks(@RequestParam("term") String text) {
+        // Você precisa implementar a lógica em TaskServiceImpl para converter para DTO
+        List<TaskResponseDto> tasks = taskService.searchTaskByText(text);
+        return ResponseEntity.ok(tasks);
     }
 
     @PatchMapping("/{taskId}/status")
@@ -65,5 +73,4 @@ public class TaskController {
         taskService.deleteTask(taskId);
         return ResponseEntity.noContent().build(); // Retorna HTTP 204 No Content
     }
-
 }
