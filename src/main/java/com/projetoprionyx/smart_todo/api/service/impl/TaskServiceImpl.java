@@ -11,10 +11,13 @@ import com.projetoprionyx.smart_todo.api.repository.UserRepository;
 import com.projetoprionyx.smart_todo.api.service.AIService;
 import com.projetoprionyx.smart_todo.api.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +33,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Autowired
     private AIService aiService;
+
+    @Autowired
+    private TaskService taskService;
 
     @Override
     @Transactional
@@ -86,6 +92,11 @@ public class TaskServiceImpl implements TaskService {
         return convertToDto(task);
     }
 
+    @Override
+    public TaskResponseDto findTaskByStatus(TaskStatus status) {
+        return null;
+    }
+
     @Transactional
     public List<Task> listarPorStatus(TaskStatus status) {
         return taskRepository.findByStatus(status);
@@ -138,6 +149,18 @@ public class TaskServiceImpl implements TaskService {
         }
         taskRepository.delete(task);
     }
+
+    @Override
+    public List<TaskResponseDto> searchTaskByText(String text) {
+        return List.of();
+    }
+
+
+    public ResponseEntity<List<TaskResponseDto>> searchTaskByTitleOrDescription(@RequestParam String text) {
+        List<TaskResponseDto> tasks = taskService.searchTaskByText(text);
+        return ResponseEntity.ok(tasks);
+    }
+
 
 
     /**

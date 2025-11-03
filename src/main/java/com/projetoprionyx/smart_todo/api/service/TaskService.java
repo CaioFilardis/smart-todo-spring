@@ -29,4 +29,7 @@ public interface TaskService {
     // Deleta uma tarefa, verificando se ela pertence ao usuário logado.
     void deleteTask(Long taskId);
 
+    // Buscar tarefa pelo título ou descrição
+    List<TaskResponseDto> searchTaskByText(String text);
+
 }
