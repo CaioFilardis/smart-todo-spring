@@ -181,7 +181,7 @@ window.onload = function() {
         chatMensagens.innerHTML += `<div style="text-align:right; color:#FFD580;">Você: ${mensagem}</div>`;
 
         // Chama backend GeminiController
-        const response = await fetch('/api/v1/gemini', {
+        const response = await fetch('/api/v1/google-gemini/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -201,3 +201,6 @@ window.onload = function() {
     };
 
 };
+
+
+

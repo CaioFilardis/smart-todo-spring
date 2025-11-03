@@ -41,7 +41,7 @@ public class TaskController {
 
     public ResponseEntity<List<Task>> listarTarefas(@RequestParam(required = false) TaskStatus status) {
         if (status != null) {
-            return ResponseEntity.ok(taskService.findTaskByStatus(status));
+            return ResponseEntity.ok((List<Task>) taskService.findTaskByStatus(status));
         }
         return null;
     }
@@ -65,4 +65,5 @@ public class TaskController {
         taskService.deleteTask(taskId);
         return ResponseEntity.noContent().build(); // Retorna HTTP 204 No Content
     }
+
 }
