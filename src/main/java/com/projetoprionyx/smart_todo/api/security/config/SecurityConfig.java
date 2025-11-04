@@ -40,7 +40,11 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         // Garantindo que esta rota seja pública
-                        .requestMatchers("/api/v1/auth/**", "/login.html", "/register.html", "/editar-tarefa.html", "/style.css", "/js/**", "/img/**", "/dashboard.html", "/").permitAll()
+                        .requestMatchers("/api/v1/auth/**", "/login.html", "/register.html",
+                                "/editar-tarefa.html", "/style.css", "/js/**",
+                                "/img/**", "/dashboard.html",
+                                "/api/v1/google-gemini/chat", "/")
+                        .permitAll()
                         // Todas as outras rotas exigem autenticação
                         .anyRequest().authenticated()
                 );

@@ -189,8 +189,10 @@ window.onload = function() {
         const mensagem = document.getElementById('inputMsgIA').value;
         const chatMensagens = document.getElementById('chatMensagens');
 
+        // Adiciona a mensagem do usuário na tela
         chatMensagens.innerHTML += `<div style="text-align:right; color:#FFD580;">Você: ${mensagem}</div>`;
 
+        // Chama o backend (GeminiController)
         const response = await fetch('/api/v1/google-gemini/chat', {
             method: 'POST',
             headers: {
@@ -206,6 +208,8 @@ window.onload = function() {
         } else {
             chatMensagens.innerHTML += `<div style="color:#EF4444;">Erro na conversa com IA</div>`;
         }
+
+        // Limpa o input
         document.getElementById('inputMsgIA').value = "";
     };
 
