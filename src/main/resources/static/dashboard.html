@@ -2,112 +2,143 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Smart Todo</title>
+    <script src="https://unpkg.com/feather-icons"></script>
     <link rel="stylesheet" href="style.css">
-    <!-- Não carregue o dashboard.js no <head>, mas sim antes do </body> para garantir que o DOM já existe -->
 </head>
 <body>
 
-<header class="dashboard-header d-flex align-items-center gap-2">
-    <h1>Bem-vindo(a)!</h1>
-    <img id="userAvatar" src="default-avatar.png" class="rounded" style="width:38px; height:38px;" />
-    <div>
-        <span id="userNome" class="fw-bold"></span>
-        <small id="userEmail" class="text-secondary"></small>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <a href="#" class="sidebar-logo">Smart Todo</a>
+        <button class="btn-icon" id="close-menu-btn" aria-label="Fechar menu">
+            <i data-feather="x"></i>
+        </button>
     </div>
-    <button id="btnConversaIA" class="btn btn-warning">Conversa IA</button>
-</header>
 
-<div class="dashboard-container">
-    <!-- Sidebar -->
-    <nav class="sidebar">
-        <h2>Smart Todo</h2>
+    <div class="sidebar-profile">
+        <img id="userAvatar" src="default-avatar.png" alt="Avatar do Usuário" class="profile-avatar">
+        <span id="userNome" class="profile-name">Carregando...</span>
+        <span id="userEmail" class="profile-email">email@carregando.com</span>
+        <button id="btnConversaIA" class="btn btn-secondary btn-ia">
+            <i data-feather="message-circle"></i>
+            Conversa IA
+        </button>
+    </div>
+
+    <nav class="sidebar-nav">
         <ul>
-            <li><a href="#">Visão Geral</a></li>
-            <li><a href="#">Minhas Tarefas</a></li>
-            <li><a href="login.html">Sair</a></li>
+            <li><a href="#" class="nav-link active"><i data-feather="grid"></i> Visão Geral</a></li>
+            <li><a href="#" class="nav-link"><i data-feather="check-square"></i> Minhas Tarefas</a></li>
+            <li><a href="login.html" class="nav-link"><i data-feather="log-out"></i> Sair</a></li>
         </ul>
     </nav>
-    <!-- Main -->
-    <div class="main-content">
-        <!-- Header -->
-        <header class="dashboard-header">
-            <h1>Bem-vindo(a)!</h1>
-        </header>
-        <!-- Cards resumo -->
-        <div class="cards-overview">
-            <div class="dashboard-card" id="totalTasks">Total de Tarefas: 0</div>
-            <div class="dashboard-card" id="pendingTasks">Tarefas Pendentes: 0</div>
-            <div class="dashboard-card" id="progressTasks">Tarefas em Progresso: 0</div>
-            <div class="dashboard-card completed" id="completedTasks">Tarefas Concluídas: 0</div>
-        </div>
-        <!-- Lista/Tabela de Tarefas -->
-        <section>
-            <h2>Minhas Tarefas</h2>
-            <button id="btnNovaTarefa" class="btn btn-success mb-3">+ Nova Tarefa</button>
-            <input type="text" id="inputBuscaTask" placeholder="Buscar tarefas por título ou descrição...">
-            <button id="btnBuscaTask">Buscar</button>
-            <table id="tasksTable">
-                <thead>
-                <tr>
-                    <th>Título</th>
-                    <th>Status</th>
-                    <th>Prioridade</th>
-                    <th>Data</th>
-                    <th>Ações</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- Linhas de tarefas JS -->
-                </tbody>
-                <button class="btn-delete" data-id="${tarefa.id}">Excluir</button>
-            </table>
-        </section>
-    </div>
-</div>
+</aside>
 
+<main class="main-content" id="main-content">
+    <header class="main-header">
+        <button class="btn-icon" id="open-menu-btn" aria-label="Abrir menu">
+            <i data-feather="menu"></i>
+        </button>
+        <h1 class="main-title">Bem-vindo(a)!</h1>
+    </header>
+
+    <section class="summary-cards">
+        <div class="card">
+            <h3>Total de Tarefas</h3>
+            <span class="card-value" id="totalTasks">0</span>
+        </div>
+        <div class="card">
+            <h3>Tarefas Pendentes</h3>
+            <span class="card-value" id="pendingTasks">0</span>
+        </div>
+        <div class="card">
+            <h3>Em Progresso</h3>
+            <span class="card-value" id="progressTasks">0</span>
+        </div>
+        <div class="card card-highlight">
+            <h3>Tarefas Concluídas</h3>
+            <span class="card-value" id="completedTasks">0</span>
+        </div>
+    </section>
+
+    <section class="tasks-section">
+        <div class="tasks-header">
+            <h2>Minhas Tarefas</h2>
+            <div class="tasks-actions">
+                <div class="search-container">
+                    <i data-feather="search"></i>
+                    <input type="text" id="inputBuscaTask" placeholder="Buscar por título...">
+                </div>
+                <button id="btnNovaTarefa" class="btn btn-primary">
+                    <i data-feather="plus"></i>
+                    <span>Nova Tarefa</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="task-list-header">
+            <span class="col-title">Título</span>
+            <span class="col-status">Status</span>
+            <span class="col-priority">Prioridade</span>
+            <span class="col-date">Data</span>
+            <span class="col-actions">Ações</span>
+        </div>
+
+        <div class="task-list" id="tasksListContainer">
+        </div>
+    </section>
+</main>
 
 <div id="novaTarefaModal" class="modal" style="display:none;">
-    <div class="modal-content">
-        <span class="close" id="closeNovaTarefa">&times;</span>
-        <h3>Nova Tarefa</h3>
+    <div class="modal-content modal-task-form">
+
+        <header class="modal-header">
+            <h3>Nova Tarefa</h3>
+            <button class="btn-icon close" id="closeNovaTarefa" aria-label="Fechar modal">
+                <i data-feather="x"></i>
+            </button>
+        </header>
+
         <form id="formNovaTarefa">
-            <input type="text" name="title" placeholder="Título" required class="form-control mb-2" />
-            <textarea name="description" placeholder="Descrição" class="form-control mb-2"></textarea>
-            <select name="priority" required class="form-control mb-2">
-                <option value="">Prioridade</option>
-                <option value="LOW">Baixa</option>
-                <option value="MEDIUM">Média</option>
-                <option value="HIGH">Alta</option>
-            </select>
-            <button type="submit" class="btn btn-primary">Salvar</button>
+            <div class="form-group">
+                <label for="taskTitle">Título</label>
+                <input type="text" id="taskTitle" name="title" placeholder="Ex: Fazer compras" required class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="taskDescription">Descrição</label>
+                <textarea id="taskDescription" name="description" placeholder="Ex: Comprar leite, ovos, pão..." class="form-control" rows="4"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Salvar Tarefa</button>
         </form>
     </div>
 </div>
 
-<!-- Modal do chat com IA -->
 <div id="modalConversaIA" class="modal" style="display:none;">
-    <div class="modal-content" style="min-width:350px;">
-        <span class="close" id="closeConversaIA">&times;</span>
-        <h5>Converse com a IA</h5>
+    <div class="modal-content modal-chat"> <header class="modal-header">
+        <h3>Converse com a IA</h3>
+        <span class="close" id="closeConversaIA" title="Fechar">&times;</span>
+    </header>
 
-        <div id="chatMensagens" class="mb-2" style="..."></div>
+        <div id="chatMensagens" class="chat-window">
+        </div>
 
-        <form id="formConversaIA" class="d-flex gap-2">
-            <input type="text" id="inputMsgIA" class="form-control" placeholder="Digite sua dúvida..." required/>
-            <button type="submit" class="btn btn-primary">Enviar</button>
+        <form id="formConversaIA" class="chat-form">
+            <textarea id="inputMsgIA" class="form-control" placeholder="Digite sua dúvida... (Shift+Enter para nova linha)" required rows="1"></textarea>
+            <button type="submit" class="btn btn-primary btn-send" aria-label="Enviar mensagem">
+                <i data-feather="send"></i>
+            </button>
         </form>
     </div>
 </div>
 
 
-
-
-
-<!-- Carregue o JS aqui para garantir que os elementos existem -->
+<script>
+    feather.replace(); // Ativa os ícones
+</script>
 <script src="./js/dashboard.js"></script>
-
-
-
 </body>
 </html>
