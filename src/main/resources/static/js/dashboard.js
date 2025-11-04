@@ -340,45 +340,65 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Lógica do Chat IA (Melhorada para usar CSS) ---
-    formConversaIA.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const mensagem = inputMsgIA.value;
-        if (!mensagem.trim()) return;
+    // --- Lógica do Chat IA (ATUALIZADA COM LOADING) ---
+        formConversaIA.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const mensagem = inputMsgIA.value;
+            if (!mensagem.trim()) return;
 
-        // Adiciona a bolha do usuário usando as classes do CSS
-        const userBubble = document.createElement('div');
-        userBubble.className = 'chat-message user-message';
-        userBubble.innerHTML = mensagem.replace(/\n/g, '<br>');
-        chatMensagens.appendChild(userBubble);
+            // 1. Adiciona a bolha do usuário
+            const userBubble = document.createElement('div');
+            userBubble.className = 'chat-message user-message';
+            userBubble.innerHTML = mensagem.replace(/\n/g, '<br>');
+            chatMensagens.appendChild(userBubble);
 
-        chatMensagens.scrollTop = chatMensagens.scrollHeight;
-        inputMsgIA.value = "";
-        inputMsgIA.style.height = 'auto'; // Reseta altura do textarea
+            // 2. Limpa o input e rola a tela
+            chatMensagens.scrollTop = chatMensagens.scrollHeight;
+            inputMsgIA.value = "";
+            inputMsgIA.style.height = 'auto'; // Reseta altura do textarea
 
-        try {
-            // Chama o endpoint do GeminiController
-            const response = await fetchApi('/api/v1/google-gemini/chat', {
-                method: 'POST',
-                body: JSON.stringify({ message: mensagem })
-            });
+            // 3. (NOVO) Cria e adiciona o indicador de "digitando"
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'chat-message ia-typing'; // Usa o CSS que acabamos de adicionar
+            typingIndicator.id = 'typing-indicator'; // Um ID para fácil remoção
+            typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+            chatMensagens.appendChild(typingIndicator);
 
-            // Assume que a resposta é um { content: "..." } ou { reply: "..." }
-            const reply = response.content || response.reply || "Desculpe, não entendi.";
+            // Rola para o novo indicador de loading
+            chatMensagens.scrollTop = chatMensagens.scrollHeight;
 
-            const iaBubble = document.createElement('div');
-            iaBubble.className = 'chat-message ia-message';
-            iaBubble.innerHTML = reply.replace(/\n/g, '<br>');
-            chatMensagens.appendChild(iaBubble);
+            try {
+                // 4. Chama o endpoint do GeminiController
+                const response = await fetchApi('/api/v1/google-gemini/chat', {
+                    method: 'POST',
+                    body: JSON.stringify({ message: mensagem })
+                });
 
-        } catch (err) {
-            const errorBubble = document.createElement('div');
-            errorBubble.className = 'chat-message error-message';
-            errorBubble.textContent = 'Erro ao conectar com a IA.';
-            chatMensagens.appendChild(errorBubble);
-        }
-        chatMensagens.scrollTop = chatMensagens.scrollHeight;
-        inputMsgIA.focus();
-    });
+                // 5. (NOVO) Remove o indicador de "digitando"
+                document.getElementById('typing-indicator')?.remove(); // O '?' é uma segurança
+
+                // 6. Adiciona a resposta real da IA
+                const reply = response.content || response.reply || "Desculpe, não entendi.";
+
+                const iaBubble = document.createElement('div');
+                iaBubble.className = 'chat-message ia-message';
+                iaBubble.innerHTML = reply.replace(/\n/g, '<br>');
+                chatMensagens.appendChild(iaBubble);
+
+            } catch (err) {
+                // 7. (NOVO) Remove o indicador de "digitando" também em caso de erro
+                document.getElementById('typing-indicator')?.remove();
+
+                const errorBubble = document.createElement('div');
+                errorBubble.className = 'chat-message error-message';
+                errorBubble.textContent = 'Erro ao conectar com a IA.';
+                chatMensagens.appendChild(errorBubble);
+            }
+
+            // 8. Rola para a nova mensagem (resposta ou erro)
+            chatMensagens.scrollTop = chatMensagens.scrollHeight;
+            inputMsgIA.focus();
+        });
 
     // Auto-resize do textarea do chat
     inputMsgIA.addEventListener('input', function() {

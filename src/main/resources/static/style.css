@@ -723,3 +723,40 @@ body.sidebar-open .sidebar-overlay {
     margin-right: 0;
     margin-left: 2px;
 }
+
+/* ============================================
+   ESTILOS DO INDICADOR DE "DIGITANDO..." (LOADING)
+   ============================================ */
+
+/* A "bolha" que contém a animação */
+.chat-message.ia-typing {
+    align-self: flex-start; /* Alinha à esquerda, como a bolha da IA */
+    background-color: var(--color-bg-card);
+    padding: 14px 18px; /* Um pouco mais de padding para os pontos */
+    border-bottom-left-radius: 4px;
+}
+
+/* Os três pontos que pulam */
+.ia-typing span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin: 0 1px;
+    border-radius: 50%;
+    background-color: var(--color-text-secondary); /* Cor cinza do texto */
+    animation: typing-bounce 1.3s infinite ease-in-out;
+}
+
+/* Animação de pulo com atraso para cada ponto */
+.ia-typing span:nth-child(1) { animation-delay: -0.32s; }
+.ia-typing span:nth-child(2) { animation-delay: -0.16s; }
+.ia-typing span:nth-child(3) { animation-delay: 0s; }
+
+@keyframes typing-bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1.0);
+    }
+}
