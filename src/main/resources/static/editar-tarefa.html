@@ -1,24 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-    <meta charset="utf-8">
-    <title>Editar Tarefa</title>
-    <link rel="stylesheet" href="style.css"></link>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Tarefa - Smart Todo</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="./css/editar-tarefa.css">
+
+    <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body>
-    <h2>Editar Tarefa</h2>
-    <form id="formEditarTarefa">
-        <input type="text" name="title" id="title" required></input>
-        <textarea name="description" id="description"></textarea>
-        <select name="priority" id="priority">
-            <option value="LOW">Prioridade</option>
-            <option value="MEDIUM">Média</option>
-            <option value="HIGH">Alta</option>
-        </select>
-        <button type="submit" class="btn btn-pimary">Salvar Alterações</button>
-    </form>
 
-    <!-- Scritp -->
-    <script src="./js/editar-tarefa.js"></script>
+<div class="edit-task-container">
+    <form id="formEditarTarefa" class="card">
+
+        <a href="index.html" class="back-link">
+            <i data-feather="arrow-left"></i>
+            <span>Voltar para o Dashboard</span>
+        </a>
+
+        <h2>Editar Tarefa</h2>
+
+        <div class="form-group">
+            <label for="title">Título</label>
+            <input type="text" name="title" id="title" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Descrição</label>
+            <textarea name="description" id="description" class="form-control" rows="5"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="priority">Prioridade</label>
+            <select name="priority" id="priority" class="form-control" required>
+                <option value="" disabled>Selecione a prioridade</option>
+                <option value="LOW">Baixa</option>
+                <option value="MEDIUM">Média</option>
+                <option value="HIGH">Alta</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+    </form>
+</div>
+
+<script>
+    feather.replace(); // Ativa os ícones
+</script>
+<script src="./js/editar-tarefa.js"></script>
 </body>
 </html>

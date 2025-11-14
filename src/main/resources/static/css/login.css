@@ -1,0 +1,176 @@
+/* ============================================
+   TEMA E LAYOUT GLOBAL
+   ============================================ */
+
+:root {
+    --color-bg-dark: #2C2F36;       /* Fundo principal do dashboard */
+    --color-bg-card: #363940;      /* Fundo do card */
+    --color-bg-input: #1F2327;     /* Fundo do input (mais escuro) */
+    --color-text-primary: #F1F5F9; /* Texto principal */
+    --color-text-secondary: #A8B5C3;/* Texto secundário/labels */
+    --color-primary: #5865F2;       /* Azul/Roxo do tema */
+    --color-warning: #F9A839;       /* Laranja/Amarelo para links */
+}
+
+body {
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-primary);
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ============================================
+   ESTILIZAÇÃO DO CARD DE LOGIN
+   ============================================ */
+
+.card {
+    width: 100%;
+    max-width: 440px; /* Define uma largura máxima para o formulário */
+    background-color: var(--color-bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    color: var(--color-text-primary);
+}
+
+/* Move o estilo inline do logo para o CSS */
+.card img {
+    width: 130px; /* Ajustado de 150px para melhor proporção */
+}
+
+.card h2.text-primary {
+    color: var(--color-primary) !important; /* Garante a cor primária do tema */
+    font-weight: 700;
+}
+
+/* ============================================
+   FORMULÁRIO (INPUTS, LABELS, BOTÃO)
+   ============================================ */
+
+.form-label {
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+.form-control {
+    background-color: var(--color-bg-input);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-bg-card);
+    padding: 0.75rem 1rem;
+    height: calc(1.5em + 1.5rem + 2px); /* Altura consistente */
+}
+
+.form-control:focus {
+    background-color: var(--color-bg-input);
+    color: var(--color-text-primary);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 0.25rem rgba(88, 101, 242, 0.25);
+}
+
+/* Cor do placeholder */
+.form-control::placeholder {
+    color: #6c757d;
+}
+
+/* Feedback de erro (Bootstrap override) */
+.invalid-feedback {
+    font-weight: 500;
+}
+
+/* Botão de login */
+.btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    padding: 0.75rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    background-color: #4752C4; /* Tom mais escuro do primary */
+    border-color: #4752C4;
+    transform: translateY(-2px); /* Efeito de "levantar" */
+    box-shadow: 0 4px 15px rgba(88, 101, 242, 0.2);
+}
+
+.btn-primary:disabled {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+/* ============================================
+   ELEMENTOS ADICIONAIS
+   ============================================ */
+
+/* Alerta de erro (Bootstrap override) */
+#login-error.alert-danger {
+    background-color: #ED4245; /* Vermelho do tema */
+    color: #FFF;
+    border: none;
+    font-weight: 500;
+}
+
+/* Link de "Cadastrar conta" */
+.link-warning {
+    color: var(--color-warning) !important;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.link-warning:hover {
+    color: #ffc107 !important; /* Amarelo mais claro do Bootstrap */
+    text-decoration: underline;
+}
+
+/* --- Ícone de olho (Movido do <style> do HTML) --- */
+.input-password-group {
+    position: relative;
+}
+
+.eye-toggle {
+    position: absolute;
+    /* Ajustado 'top' para alinhar verticalmente com o input,
+      independente da altura da label.
+    */
+    top: calc(0.75rem + 38px); /* 0.75rem (padding) + 38px (altura da label/fonte) */
+    right: 1rem;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #A3AEBB;
+    font-size: 1.2rem;
+    z-index: 3; /* Garante que fique acima do input */
+}
+
+.eye-toggle:hover {
+    color: var(--color-text-primary);
+}
+
+
+/* --- Modal (Movido do <style> do HTML) --- */
+#statusModal .modal-content {
+    background: #22242A;
+    color: #FFD580; /* Cor de "aviso" amigável */
+    border: 1px solid #FFD580;
+}
+
+#statusModal .modal-header {
+    border-bottom: 1px solid #444;
+}
+
+/* ============================================
+   RESPONSIVIDADE
+   ============================================ */
+
+@media (max-width: 576px) {
+    .card {
+        /* Remove bordas e sombra no mobile para um look "full-screen" */
+        border: none;
+        box-shadow: none;
+        margin-top: 2rem;
+        padding: 1.5rem !important; /* Reduz o padding do p-4 */
+    }
+
+    body {
+        /* Alinha o card no topo em vez de centro em telas pequenas */
+        align-items: flex-start !important;
+    }
+}

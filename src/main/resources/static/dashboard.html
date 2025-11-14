@@ -7,7 +7,7 @@
     <script src="https://unpkg.com/feather-icons"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-theme="dark">
 
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
@@ -21,9 +21,10 @@
         <img id="userAvatar" src="default-avatar.png" alt="Avatar do Usuário" class="profile-avatar">
         <span id="userNome" class="profile-name">Carregando...</span>
         <span id="userEmail" class="profile-email">email@carregando.com</span>
-        <button id="btnConversaIA" class="btn btn-secondary btn-ia">
+        <button id="btnConversaIA" class="btn btn-primary btn-ia" title="Conversa com a IA (Ctrl+K)">
             <i data-feather="message-circle"></i>
-            Conversa IA
+            <span>Chat IA</span>
+            <span class="badge badge-notification">2</span>
         </button>
     </div>
 

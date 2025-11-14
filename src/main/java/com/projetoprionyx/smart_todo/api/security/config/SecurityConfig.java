@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         // Garantindo que esta rota seja pública
                         .requestMatchers("/api/v1/auth/**", "/login.html", "/register.html",
-                                "/editar-tarefa.html", "/style.css", "/js/**",
+                                "/editar-tarefa.html", "/style.css", "/login.css", "/js/**",
                                 "/img/**", "/dashboard.html",
                                 "/api/v1/google-gemini/chat", "/")
                         .permitAll()

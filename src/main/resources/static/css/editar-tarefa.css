@@ -1,0 +1,103 @@
+/* ============================================
+ * CSS EXCLUSIVO PARA A PÁGINA DE EDIÇÃO
+ * ============================================
+ */
+
+/* * 1. LAYOUT DA PÁGINA
+ * Centraliza o formulário na tela.
+ * A tag <body> já pega a cor de fundo do style.css importado.
+ */
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+}
+
+/* * 2. ESTILOS DO CONTAINER DO FORMULÁRIO
+ * Define a largura do card na tela.
+ */
+.edit-task-container {
+    width: 100%;
+    max-width: 600px; /* Largura máxima do formulário */
+}
+
+/* * 3. AJUSTES NO .card
+ * O .card já vem estilizado do style.css,
+ * mas precisamos garantir que ele ocupe 100% do container.
+ */
+.edit-task-container .card {
+    width: 100%;
+    max-width: 100%;
+    padding: 32px;
+    animation: fadeIn 0.5s ease-out; /* Reutiliza a animação de fadeIn */
+}
+
+/* * 4. ESTILOS DO FORMULÁRIO
+ */
+#formEditarTarefa {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Espaçamento moderno entre os campos */
+}
+
+#formEditarTarefa h2 {
+    text-align: left;
+    margin-bottom: 8px; /* Menos espaço após o título */
+}
+
+/* Remove a margem padrão, pois estamos usando 'gap' */
+.form-group {
+    margin-bottom: 0;
+}
+
+/* * 5. AJUSTES NOS INPUTS
+ * O .form-control já vem estilizado do style.css.
+ * Apenas garantimos que ele não tenha margens desnecessárias.
+ */
+.form-control {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+/* Melhora o textarea */
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* Botão de submit */
+#formEditarTarefa .btn-primary {
+    width: 100%;
+    margin-top: 16px; /* Espaço extra antes do botão */
+    padding: 14px;
+}
+
+/* Link de "Voltar" (UX Essencial) */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.back-link:hover {
+    color: var(--color-text-primary);
+}
+.back-link i {
+    width: 18px;
+    height: 18px;
+}
+
+/* * 6. RESPONSIVIDADE
+ */
+@media (max-width: 600px) {
+    .edit-task-container .card {
+        padding: 24px;
+    }
+}

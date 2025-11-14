@@ -292,12 +292,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Ação: Editar ou Visualizar (Placeholder)
-        if (button.classList.contains('btn-action-editar') || button.classList.contains('btn-action-visualizar')) {
-            alert(`Visualização/Edição da tarefa ${taskId} ainda não implementada.`);
-            // TODO: Buscar dados da tarefa com fetchApi(`/api/v1/tasks/${taskId}`)
-            // TODO: Preencher e abrir um modal de edição (que precisa ser criado no HTML)
-        }
+        // Ação: Editar (Implementado)
+                if (button.classList.contains('btn-action-editar')) {
+                    // Redireciona o navegador para a página de edição, passando o ID da tarefa na URL.
+                    window.location.href = `editar-tarefa.html?id=${taskId}`;
+                }
+
+                // Ação: Visualizar (Placeholder)
+                if (button.classList.contains('btn-action-visualizar')) {
+                    alert(`A visualização da tarefa ${taskId} ainda não foi implementada.`);
+                    // No futuro, aqui você poderia abrir um modal com os detalhes.
+                }
     });
 
     // --- Lógica de Criação de Tarefa (Corrigida) ---
