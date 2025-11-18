@@ -1,17 +1,16 @@
 $(document).ready(function(){
 
-    // --- FUNÇÃO DE LOGIN ---
+    // --- FUNÇÃO DE LOGIN (CORRIGIDA) ---
     $("#login-form").on("submit", function(e) {
-        e.preventDefault();
+        e.preventDefault(); // Impede o envio padrão do formulário
 
         $("#btn-login").prop("disabled", true);
         $("#login-error").addClass("d-none").text("");
-        // Limpa validações anteriores
         $(".is-invalid").removeClass("is-invalid");
 
+        // --- ESTAS LINHAS ESTAVAM FALTANDO ---
         var email = $("#email").val();
         var senha = $("#senha").val();
-
         let camposOk = true;
 
         if (email.trim() === "") {
@@ -24,24 +23,29 @@ $(document).ready(function(){
             $("#senha-feedback").text("Preencha a senha.");
             camposOk = false;
         }
+        // --- FIM DAS LINHAS QUE FALTAVAM ---
 
         if (!camposOk) {
             $("#btn-login").prop("disabled", false);
-            return false;
+            return false; // Para a execução se os campos estiverem vazios
         }
 
+        // Agora a requisição AJAX será chamada corretamente
         $.ajax({
-            url: "/api/v1/auth/login", // Ajuste para a URL correta da sua API
+            url: "/api/v1/auth/login",
             method: "POST",
             contentType: "application/json",
             data: JSON.stringify({
-                email: email,
-                password: senha // O backend espera 'password' ou 'senha'? Verifique seu DTO
+                email: email,    // 'email' agora existe
+                password: senha  // 'senha' agora existe
             }),
             success: function(response) {
-                // Supondo que o token venha na resposta
-                localStorage.setItem("token", response.token);
-                window.location.href = "dashboard.html";
+                if (response && response.accessToken) {
+                    localStorage.setItem("token", response.accessToken);
+                    window.location.href = "dashboard.html";
+                } else {
+                    $("#login-error").removeClass("d-none").text("Erro no login: Token não recebido.");
+                }
             },
             error: function(xhr) {
                 var msg = "Erro ao autenticar. Verifique seus dados.";
@@ -63,12 +67,10 @@ $(document).ready(function(){
 
         if (inputType === "password") {
             $senhaInput.attr("type", "text");
-            // Altera o ícone para "olho fechado"
-            $(this).html('&#128064;');
+            $(this).html('&#128064;'); // Olho fechado
         } else {
             $senhaInput.attr("type", "password");
-            // Altera de volta para "olho aberto"
-            $(this).html('&#128065;');
+            $(this).html('&#128065;'); // Olho aberto
         }
     });
 });

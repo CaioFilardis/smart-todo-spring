@@ -39,17 +39,20 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // Garantindo que esta rota seja pública
-                        .requestMatchers("/api/v1/auth/**", "/login.html", "/register.html",
-                                "/editar-tarefa.html", "/style.css", "/login.css", "/js/**",
+                        // CORREÇÃO: Apenas /login e /register de 'auth' são públicos
+                        .requestMatchers(
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/register", // Adicione se você tiver um endpoint de registro
+                                "/login.html", "/register.html",
+                                "/editar-tarefa.html", "/css/**", "/js/**",
                                 "/img/**", "/dashboard.html",
-                                "/api/v1/google-gemini/chat", "/")
+                                "/api/v1/google-gemini/chat", "/"
+                        )
                         .permitAll()
-                        // Todas as outras rotas exigem autenticação
+                        // /api/v1/auth/me e /api/v1/tasks agora cairão aqui
                         .anyRequest().authenticated()
                 );
 
-        // Adicionando nosso filtro JWT antes do filtro padrão
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
