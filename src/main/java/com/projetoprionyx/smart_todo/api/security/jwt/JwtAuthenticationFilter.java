@@ -19,10 +19,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/**
- * Filtro customizado que intercepta todas as requisições para processar o token JWT.
- * Ele é executado uma vez por requisição.
- */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 

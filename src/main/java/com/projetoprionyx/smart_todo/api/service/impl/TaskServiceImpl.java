@@ -95,12 +95,6 @@ public class TaskServiceImpl implements TaskService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public List<Task> listarPorStatus(Long taskId, TaskStatus status) {
-        return taskRepository.findByUserIdAndStatus(taskId, status);
-    }
-
-
     @Override
     @Transactional
     public TaskResponseDto updateTaskStatus(Long taskId, TaskStatus newStatus) {

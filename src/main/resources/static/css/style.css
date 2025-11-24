@@ -7,7 +7,7 @@
     --color-bg-card: #363940;   /* Fundo dos cards e itens de tarefa */
     --color-bg-input: #1F2327;  /* Fundo dos inputs, igual à sidebar */
 
-    --color-text-primary: #F1F5F9; /* Texto principal (branco-acinzentado) */
+    --color-text-primary: white; /* Texto principal (branco-acinzentado) */
     --color-text-secondary:  #A8B5C3; /* Texto secundário (cinza) */
     --color-text-header: #FFFFFF;    /* Títulos principais (branco) */
 
@@ -152,9 +152,11 @@ body.sidebar-open .sidebar {
     }
 
     .task-item:hover {
+      box-shadow: 0 4px 16px rgba(80,90,180,0.12);
       background-color: rgba(88, 101, 242, 0.05); /* Destaque suave */
       border-left: 3px solid var(--color-primary);
       padding-left: 13px; /* Compensa a borda */
+      ransition: box-shadow 0.2s, background 0.4s;
     }
 
     /* ERRO CORRIGIDO: Havia um '}' extra aqui,
@@ -344,9 +346,14 @@ body.sidebar-open .sidebar {
     border: 1px solid var(--color-bg-card);
     border-radius: var(--border-radius);
     padding: 10px 16px 10px 44px; /* Espaço para o ícone */
-    color: var(--color-text-primary);
+    color: var(--color-text-secondary);
     font-size: 15px;
     min-width: 280px;
+}
+
+#inputBuscaTask::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 0.8;
 }
 
 .btn:active {
@@ -389,6 +396,13 @@ body.sidebar-open .sidebar {
     font-size: 32px;
     font-weight: 700;
     color: var(--color-text-header);
+    transition: color 0.2s, transform 0.25s;
+    will-change: transform;
+}
+
+.card-value:active {
+    color: var(--color-primary);
+    transform: scale(1.1);
 }
 
 .card.card-highlight {
@@ -518,6 +532,20 @@ body.sidebar-open .sidebar {
         justify-content: flex-end; /* Alinha botões à direita */
     }
 }
+
+
+@media (max-width: 480px) {
+    .summary-cards,
+    .modal-content,
+    .tasks-section {
+        padding: 12px;
+    }
+    .main-header {
+        gap: 8px;
+        padding: 8px 0;
+    }
+}
+
 
 /* ============================================
    ESTILOS DOS MODAIS (Genérico)
