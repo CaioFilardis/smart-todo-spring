@@ -1,434 +1,437 @@
-/**
- * ===================================================================
- * SMART TODO - DASHBOARD SCRIPT (Refatorado para Layout Moderno)
- * ===================================================================
- * * Este script controla todo o dashboard, incluindo:
- * 1. Carregamento inicial de dados (Perfil, Tarefas)
- * 2. Renderização da lista de tarefas no novo layout de DIVs
- * 3. Gerenciamento de eventos (CRUD de tarefas, Modais, Chat, Busca)
- * 4. Lógica de responsividade do menu mobile.
- */
-
-// Espera o DOM (estrutura HTML) estar completamente carregado antes de executar o script.
 document.addEventListener('DOMContentLoaded', () => {
+    // ==================================================================
+    // 1. CONFIGURAÇÕES E SELETORES GLOBAIS
+    // ==================================================================
+    const BASE_URL = '/api/v1/tasks';
+    const JWT = localStorage.getItem('token');
 
-    // -----------------------------------------------------------------
-    // 1. SELETORES DE ELEMENTOS
-    // -----------------------------------------------------------------
-    const token = localStorage.getItem('token');
-
-    // Cache local de tarefas para busca rápida
-    let allTasks = [];
-
-    // Perfil
-    const userAvatar = document.getElementById('userAvatar');
-    const userNome = document.getElementById('userNome');
-    const userEmail = document.getElementById('userEmail');
-
-    // Menu Mobile
-    const sidebar = document.getElementById('sidebar');
-    const openBtn = document.getElementById('open-menu-btn');
-    const closeBtn = document.getElementById('close-menu-btn');
-    const overlay = document.createElement('div');
-    overlay.className = 'sidebar-overlay';
-    document.body.appendChild(overlay);
+    // Elementos da UI (Tarefas)
+    const tasksContainer = document.getElementById('tasksListContainer');
+    const userNomeElement = document.getElementById('userNome');
+    const userEmailElement = document.getElementById('userEmail');
 
     // Cards de Resumo
-    const totalTasksEl = document.getElementById('totalTasks');
-    const pendingTasksEl = document.getElementById('pendingTasks');
-    const progressTasksEl = document.getElementById('progressTasks');
-    const completedTasksEl = document.getElementById('completedTasks');
+    const totalTasksElement = document.getElementById('totalTasks');
+    const pendingTasksElement = document.getElementById('pendingTasks');
+    const progressTasksElement = document.getElementById('progressTasks');
+    const completedTasksElement = document.getElementById('completedTasks');
 
-    // Seção de Tarefas
-    const tasksListContainer = document.getElementById('tasksListContainer');
-    const btnNovaTarefa = document.getElementById('btnNovaTarefa');
-    const inputBuscaTask = document.getElementById('inputBuscaTask');
-
-    // Modal de Nova Tarefa
-    const novaTarefaModal = document.getElementById('novaTarefaModal');
-    const closeNovaTarefa = document.getElementById('closeNovaTarefa');
+    // Modais e Forms (Tarefas)
+    const modalNovaTarefa = document.getElementById('novaTarefaModal');
+    const btnAbrirModal = document.getElementById('btnNovaTarefa');
+    const btnFecharModal = document.getElementById('closeNovaTarefa');
     const formNovaTarefa = document.getElementById('formNovaTarefa');
 
-    // Modal de Chat IA
-    const btnConversaIA = document.getElementById('btnConversaIA');
-    const modalConversaIA = document.getElementById('modalConversaIA');
-    const closeConversaIA = document.getElementById('closeConversaIA');
-    const chatMensagens = document.getElementById('chatMensagens');
-    const formConversaIA = document.getElementById('formConversaIA');
-    const inputMsgIA = document.getElementById('inputMsgIA');
+    // Elementos do Chat IA (Adicionados para a solução)
+    const modalChat = document.getElementById('modalConversaIA');
+    const btnAbrirChat = document.getElementById('btnConversaIA');
+    const btnFecharChat = document.getElementById('closeConversaIA');
+    const formChat = document.getElementById('formConversaIA');
+    const inputChat = document.getElementById('inputMsgIA');
+    const areaMensagens = document.getElementById('chatMensagens');
 
-    // -----------------------------------------------------------------
-    // 2. FUNÇÃO HELPER DE FETCH (Centraliza a Lógica de API)
-    // -----------------------------------------------------------------
 
-    /**
-     * Uma função wrapper para o 'fetch' que automaticamente:
-     * 1. Adiciona o cabeçalho 'Authorization' com o token.
-     * 2. Define 'Content-Type' como 'application/json' (quando aplicável).
-     * 3. Redireciona para o login se o token for inválido (401/403).
-     * 4. Lança um erro para respostas não-ok.
-     */
-    async function fetchApi(url, options = {}) {
-        const headers = {
-            'Authorization': `Bearer ${token}`,
-            ...options.headers,
+    // ==================================================================
+    // 2. VERIFICAÇÃO DE SEGURANÇA
+    // ==================================================================
+    if (!JWT) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // ==================================================================
+    // 3. FUNÇÕES AUXILIARES
+    // ==================================================================
+    const getBadgeClass = (value) => {
+        if (!value) return 'badge-secondary';
+        const lower = value.toLowerCase();
+
+        const map = {
+            'pending': 'status-pending',
+            'in_progress': 'status-in-progress',
+            'em_progresso': 'status-in-progress', // Caso venha do Enum
+            'completed': 'status-completed',
+            'high': 'priority-high',
+            'medium': 'priority-medium',
+            'low': 'priority-low'
         };
+        return map[lower] || 'badge-secondary';
+    };
 
-        // Adiciona Content-Type se houver um corpo (body) e não for FormData
-        if (options.body && !(options.body instanceof FormData)) {
-            headers['Content-Type'] = 'application/json';
-        }
+    const formatDate = (dateString) => {
+        if (!dateString) return '--/--/----';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-BR');
+    };
+
+    // Função Fetch Wrapper para incluir Headers automaticamente
+    const authFetch = async (url, options = {}) => {
+        const headers = {
+            'Authorization': `Bearer ${JWT}`,
+            'Content-Type': 'application/json',
+            ...options.headers
+        };
 
         const response = await fetch(url, { ...options, headers });
 
-        // Se o token for inválido ou expirado, o backend retorna 401 ou 403.
-        // Redirecionamos para o login.
         if (response.status === 401 || response.status === 403) {
-            localStorage.removeItem('token'); // Limpa o token inválido
+            alert('Sessão expirada. Faça login novamente.');
+            localStorage.removeItem('token');
             window.location.href = 'login.html';
-            throw new Error('Não autorizado. Redirecionando para login.');
+            return null;
         }
+        return response;
+    };
 
-        // Para requisições DELETE que retornam 204 No Content
-        if (response.status === 204) {
-            return null; // Não há JSON para decodificar
-        }
+    // ==================================================================
+    // 4. LÓGICA DE DADOS (CRUD TAREFAS)
+    // ==================================================================
 
-        // Para outras respostas, tentamos decodificar o JSON
-        const data = await response.json().catch(() => {
-            // Se a resposta não for JSON (ex: erro 500 com HTML)
-            throw new Error(`Erro ${response.status}: A resposta não é um JSON válido.`);
-        });
-
-        // Se a resposta for um erro (ex: 400 Bad Request, 404 Not Found)
-        if (!response.ok) {
-            throw new Error(data.message || `Erro HTTP: ${response.status}`);
-        }
-
-        return data;
-    }
-
-    // -----------------------------------------------------------------
-    // 3. FUNÇÕES PRINCIPAIS (Carregar, Renderizar, Atualizar)
-    // -----------------------------------------------------------------
-
-    /**
-     * Carrega o perfil do usuário e atualiza a sidebar.
-     */
-    async function loadUserProfile() {
+    // --- READ (Listar) ---
+    const fetchTasks = async () => {
         try {
-            // Este endpoint /me foi adicionado ao AuthController
-            const user = await fetchApi('/api/v1/auth/me');
-            userNome.textContent = user.fullName; // Assumindo que o campo é fullName
-            userEmail.textContent = user.email;
-            // userAvatar.src = user.avatarUrl || 'default-avatar.png'; // Futura melhoria
-        } catch (error) {
-            console.error('Falha ao carregar perfil do usuário:', error.message);
-        }
-    }
+            const response = await authFetch(BASE_URL);
+            if (!response) return;
 
-    /**
-     * Carrega as estatísticas (cards) e a lista de tarefas.
-     */
-    async function loadDashboardData() {
-        try {
-            allTasks = await fetchApi('/api/v1/tasks');
-            updateSummaryCards(allTasks);
-            renderTasks(allTasks);
-        } catch (error) {
-            console.error('Falha ao carregar dados do dashboard:', error.message);
-            tasksListContainer.innerHTML = '<div class="task-item"><span class="task-title">Erro ao carregar tarefas. Tente recarregar a página.</span></div>';
-        }
-    }
-
-    /**
-     * Atualiza os 4 cards de resumo com base na lista de tarefas.
-     * CORRIGIDO: Agora atualiza apenas o número, pois o label está no HTML.
-     */
-    function updateSummaryCards(tasks) {
-        totalTasksEl.textContent = tasks.length;
-        pendingTasksEl.textContent = tasks.filter(t => t.status === 'PENDING').length;
-        progressTasksEl.textContent = 0; // Corrigido (não temos 'IN_PROGRESS')
-        completedTasksEl.textContent = tasks.filter(t => t.status === 'COMPLETED').length;
-    }
-
-    /**
-     * Renderiza a lista de tarefas no DOM.
-     * REFEITO: Esta função agora cria 'div.task-item' para o novo layout.
-     */
-    function renderTasks(tasks) {
-        tasksListContainer.innerHTML = ''; // Limpa a lista atual
-
-        if (tasks.length === 0) {
-            tasksListContainer.innerHTML = '<div class="task-item"><span class="task-title">Você ainda não tem tarefas cadastradas.</span></div>';
-            return;
-        }
-
-        tasks.forEach(task => {
-            // Define as classes de CSS com base no status e prioridade
-            const statusClass = `status-${task.status.toLowerCase()}`;
-            const priorityClass = `priority-${task.priority ? task.priority.toLowerCase() : 'low'}`;
-
-            let formattedDate = 'N/A';
-            if (task.dueDate) {
-                // Converte a data AAAA-MM-DD para DD/MM/AAAA
-                try {
-                    const [year, month, day] = task.dueDate.split('-');
-                    formattedDate = `${day}/${month}/${year}`;
-                } catch (e) {
-                    console.warn("Formato de data inválido recebido:", task.dueDate);
-                }
+            if (response.ok) {
+                const tasks = await response.json();
+                renderTasks(tasks);
+                updateSummary(tasks);
+            } else {
+                console.error('Erro ao buscar tarefas');
             }
+        } catch (error) {
+            console.error('Erro de rede:', error);
+            if (tasksContainer) {
+                tasksContainer.innerHTML = '<p class="text-center text-danger">Erro de conexão com o servidor.</p>';
+            }
+        }
+    };
 
-            const taskItem = document.createElement('div');
-            taskItem.className = 'task-item';
-            taskItem.setAttribute('data-task-id', task.id); // Armazena o ID no elemento
+    // --- CREATE (Criar com IA) ---
+    if (formNovaTarefa) {
+        formNovaTarefa.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-            // Gera o HTML do botão "Concluir" ou "Editar" condicionalmente
-            const actionButton = task.status === 'PENDING' ?
-                `<button class="btn btn-success btn-action-concluir" aria-label="Concluir"><i data-feather="check"></i> <span>Concluir</span></button>` :
-                `<button class="btn btn-icon-only btn-action-editar" aria-label="Editar"><i data-feather="edit-2"></i></button>`;
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const btnSubmit = formNovaTarefa.querySelector('button[type="submit"]');
+            const btnOriginalText = btnSubmit.innerHTML;
 
-            // Gera o HTML do item da tarefa
-            taskItem.innerHTML = `
-                <span class="task-title" title="${task.description || ''}">${task.title}</span>
-                <span class="task-status ${statusClass}">${task.status}</span>
-                <span class="task-priority ${priorityClass}">${task.priority || 'N/D'}</span>
-                <span class="task-date">${formattedDate}</span>
-                <div class="task-actions">
-                    <button class="btn btn-secondary btn-action-visualizar">Visualizar</button>
-                    ${actionButton}
-                    <button class="btn btn-icon-only btn-danger btn-action-excluir" aria-label="Excluir"><i data-feather="trash-2"></i></button>
-                </div>
-            `;
+            // UI Loading State
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Processando IA...`;
 
-            tasksListContainer.appendChild(taskItem);
-        });
-
-        feather.replace(); // Re-ativa os ícones do Feather
-    }
-
-    // -----------------------------------------------------------------
-    // 4. HANDLERS DE EVENTOS (A Lógica da Aplicação)
-    // -----------------------------------------------------------------
-
-    // --- Lógica de Navegação Mobile (Adicionada) ---
-    openBtn.addEventListener('click', () => {
-        document.body.classList.add('sidebar-open');
-    });
-
-    closeBtn.addEventListener('click', () => {
-        document.body.classList.remove('sidebar-open');
-    });
-
-    overlay.addEventListener('click', () => {
-        document.body.classList.remove('sidebar-open');
-    });
-
-    // --- Lógica dos Modais (Corrigida) ---
-    // Verifica se os elementos existem antes de adicionar eventos
-    if (btnNovaTarefa && novaTarefaModal) {
-        btnNovaTarefa.addEventListener('click', () => {
-            novaTarefaModal.style.display = 'flex';
-        });
-    }
-    if (closeNovaTarefa && novaTarefaModal) {
-        closeNovaTarefa.addEventListener('click', () => {
-            novaTarefaModal.style.display = 'none';
-        });
-    }
-
-    if (btnConversaIA && modalConversaIA) {
-        btnConversaIA.addEventListener('click', () => {
-            modalConversaIA.style.display = 'flex';
-            chatMensagens.innerHTML = ""; // Limpa o chat
-            inputMsgIA.focus();
-        });
-    }
-    if (closeConversaIA && modalConversaIA) {
-        closeConversaIA.addEventListener('click', () => {
-            modalConversaIA.style.display = 'none';
-        });
-    }
-
-    // --- Lógica de Ações de Tarefa (Event Delegation) ---
-    // Adiciona UM ouvinte de evento ao contêiner pai
-    tasksListContainer.addEventListener('click', async (e) => {
-        // Encontra o botão exato que foi clicado
-        const button = e.target.closest('button');
-        if (!button) return; // Não foi um clique em um botão
-
-        // Encontra o item de tarefa pai para obter o ID
-        const taskItem = button.closest('.task-item');
-        const taskId = taskItem.dataset.taskId;
-
-        // Ação: Concluir Tarefa
-        if (button.classList.contains('btn-action-concluir')) {
             try {
-                // O body precisa ser um DTO { "status": "COMPLETED" }
-                await fetchApi(`/api/v1/tasks/${taskId}/status`, {
-                    method: 'PATCH',
-                    body: JSON.stringify({ status: 'COMPLETED' })
+                const response = await authFetch(BASE_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ title, description }) // IA define prioridade e data
                 });
-                await loadDashboardData(); // Recarrega tudo
+
+                if (response && response.ok) {
+                    modalNovaTarefa.style.display = 'none';
+                    formNovaTarefa.reset();
+                    await fetchTasks(); // Atualiza a lista
+                } else {
+                    alert('Não foi possível criar a tarefa.');
+                }
             } catch (error) {
-                console.error('Erro ao concluir tarefa:', error.message);
-                alert('Não foi possível concluir a tarefa.');
+                console.error(error);
+                alert('Erro ao conectar.');
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = btnOriginalText;
             }
-        }
+        });
+    }
 
-        // Ação: Excluir Tarefa
-        if (button.classList.contains('btn-action-excluir')) {
-            if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
-                try {
-                    await fetchApi(`/api/v1/tasks/${taskId}`, {
-                        method: 'DELETE'
-                    });
-                    await loadDashboardData(); // Recarrega tudo
-                } catch (error) {
-                    console.error('Erro ao excluir tarefa:', error.message);
-                    alert('Não foi possível excluir a tarefa.');
+    // --- DELETE e REDIRECT EDIT (Event Delegation) ---
+    if (tasksContainer) {
+        tasksContainer.addEventListener('click', async (e) => {
+            const btnDelete = e.target.closest('.btn-delete');
+            const btnEdit = e.target.closest('.btn-edit');
+
+            // EXCLUIR
+            if (btnDelete) {
+                const id = btnDelete.dataset.id;
+                if (confirm('Deseja realmente excluir esta tarefa?')) {
+                    const response = await authFetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
+                    if (response && (response.ok || response.status === 204)) {
+                        await fetchTasks();
+                    } else {
+                        alert('Erro ao excluir tarefa.');
+                    }
                 }
             }
-        }
 
-        // Ação: Editar (Implementado)
-                if (button.classList.contains('btn-action-editar')) {
-                    // Redireciona o navegador para a página de edição, passando o ID da tarefa na URL.
-                    window.location.href = `editar-tarefa.html?id=${taskId}`;
-                }
+            // EDITAR (Redirecionar)
+            if (btnEdit) {
+                const id = btnEdit.dataset.id;
+                window.location.href = `editar-tarefa.html?id=${id}`;
+            }
+        });
+    }
 
-                // Ação: Visualizar (Placeholder)
-                if (button.classList.contains('btn-action-visualizar')) {
-                    alert(`A visualização da tarefa ${taskId} ainda não foi implementada.`);
-                    // No futuro, aqui você poderia abrir um modal com os detalhes.
-                }
-    });
+    // ==================================================================
+    // 5. RENDERIZAÇÃO E UI TAREFAS
+    // ==================================================================
 
-    // --- Lógica de Criação de Tarefa (Corrigida) ---
-    formNovaTarefa.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(formNovaTarefa);
-        const data = {
-            title: formData.get('title'),
-            description: formData.get('description')
-            // CORRIGIDO: Removemos a prioridade, pois a IA irá defini-la
+    // ==================================================================
+        // 5. RENDERIZAÇÃO E UI (CORRIGIDO PARA ALINHAMENTO GRID)
+        // ==================================================================
+        const renderTasks = (tasks) => {
+            if (!tasksContainer) return;
+            tasksContainer.innerHTML = '';
+
+            if (tasks.length === 0) {
+                tasksContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i data-feather="inbox" style="width: 48px; height: 48px; opacity: 0.5;"></i>
+                        <p class="mt-3 text-secondary">Você não tem tarefas pendentes.</p>
+                    </div>`;
+                feather.replace();
+                return;
+            }
+
+            tasks.forEach(task => {
+                const el = document.createElement('div');
+                el.className = 'task-item'; // Grid Container
+
+                // Tratamento visual para status
+                const statusBadge = getBadgeClass(task.status);
+                const priorityBadge = getBadgeClass(task.priority);
+
+                // NOTA: A estrutura abaixo cria 5 filhos diretos para o Grid
+                el.innerHTML = `
+                    <div class="col-title">
+                        <strong>${task.title}</strong>
+                        <span class="text-secondary small d-block text-truncate" style="max-width: 100%;">
+                            ${task.description || ''}
+                        </span>
+                    </div>
+
+                    <div class="col-status">
+                        <span class="badge ${statusBadge}">${task.status}</span>
+                    </div>
+
+                    <div class="col-priority">
+                        <span class="badge ${priorityBadge}">${task.priority || 'NORMAL'}</span>
+                    </div>
+
+                    <div class="col-date">
+                        <span class="text-secondary small">
+                            <i data-feather="calendar" style="width:12px; vertical-align: middle;"></i>
+                            ${formatDate(task.dueDate)}
+                        </span>
+                    </div>
+
+                    <div class="col-actions">
+                        <button class="btn-icon btn-edit" data-id="${task.id}" title="Editar">
+                            <i data-feather="edit-2" style="width: 18px; height: 18px;"></i>
+                        </button>
+                        <button class="btn-icon btn-delete text-danger" data-id="${task.id}" title="Excluir">
+                            <i data-feather="trash-2" style="width: 18px; height: 18px;"></i>
+                        </button>
+                    </div>
+                `;
+                tasksContainer.appendChild(el);
+            });
+            feather.replace();
         };
 
+    const updateSummary = (tasks) => {
+        if(totalTasksElement) totalTasksElement.innerText = tasks.length;
+        if(pendingTasksElement) pendingTasksElement.innerText = tasks.filter(t => t.status === 'PENDING').length;
+        if(progressTasksElement) progressTasksElement.innerText = tasks.filter(t => t.status === 'IN_PROGRESS' || t.status === 'EM_PROGRESSO').length;
+        if(completedTasksElement) completedTasksElement.innerText = tasks.filter(t => t.status === 'COMPLETED').length;
+    };
+
+    const loadUserProfile = async () => {
         try {
-            await fetchApi('/api/v1/tasks', {
-                method: 'POST',
-                body: JSON.stringify(data)
-            });
-            novaTarefaModal.style.display = 'none';
-            formNovaTarefa.reset();
-            await loadDashboardData(); // Recarrega tudo
-        } catch (error) {
-            console.error('Erro ao criar tarefa:', error.message);
-            alert('Não foi possível criar a tarefa.');
+            const response = await authFetch('/api/v1/auth/me');
+            if (response && response.ok) {
+                const user = await response.json();
+                if(userNomeElement) userNomeElement.innerText = user.fullName;
+                if(userEmailElement) userEmailElement.innerText = user.email;
+
+                // Avatar via UI Avatars
+                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=5865F2&color=fff`;
+                const imgAvatar = document.getElementById('userAvatar');
+                if(imgAvatar) imgAvatar.src = avatarUrl;
+            }
+        } catch (e) {
+            console.error("Erro ao carregar perfil", e);
+        }
+    };
+
+    // ==================================================================
+    // 6. EVENTOS DE MODAL (TAREFA)
+    // ==================================================================
+    if (btnAbrirModal) {
+        btnAbrirModal.addEventListener('click', () => {
+            modalNovaTarefa.style.display = 'flex';
+        });
+    }
+
+    if (btnFecharModal) {
+        btnFecharModal.addEventListener('click', () => {
+            modalNovaTarefa.style.display = 'none';
+        });
+    }
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modalNovaTarefa) {
+            modalNovaTarefa.style.display = 'none';
         }
     });
 
-    // --- Lógica de Busca (Melhorada) ---
-    // Filtra dinamicamente enquanto o usuário digita
-    inputBuscaTask.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
+    // ==================================================================
+    // 7. NAVEGAÇÃO SIDEBAR (Alternar Visão Geral / Minhas Tarefas)
+    // ==================================================================
+    const linkVisaoGeral = document.getElementById('link-visao-geral');
+    const linkMinhasTarefas = document.getElementById('link-minhas-tarefas');
+    const secaoResumo = document.getElementById('secao-resumo');
+    const tituloPagina = document.getElementById('titulo-pagina');
 
-        // Filtra a lista de tarefas local (em cache)
-        const filteredTasks = allTasks.filter(task =>
-            task.title.toLowerCase().includes(searchTerm) ||
-            (task.description && task.description.toLowerCase().includes(searchTerm))
-        );
+    function setActiveNav(activeLink) {
+        document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        activeLink.classList.add('active');
+        document.body.classList.remove('sidebar-open');
+    }
 
-        renderTasks(filteredTasks);
-        // Nota: A busca local não atualiza os cards de resumo.
-    });
-
-    // --- Lógica do Chat IA (Melhorada para usar CSS) ---
-    // --- Lógica do Chat IA (ATUALIZADA COM LOADING) ---
-        formConversaIA.addEventListener('submit', async (e) => {
+    if (linkVisaoGeral) {
+        linkVisaoGeral.addEventListener('click', (e) => {
             e.preventDefault();
-            const mensagem = inputMsgIA.value;
-            if (!mensagem.trim()) return;
+            setActiveNav(linkVisaoGeral);
+            if (secaoResumo) secaoResumo.style.display = 'grid';
+            if (tituloPagina) tituloPagina.textContent = 'Visão Geral';
+        });
+    }
 
-            // 1. Adiciona a bolha do usuário
-            const userBubble = document.createElement('div');
-            userBubble.className = 'chat-message user-message';
-            userBubble.innerHTML = mensagem.replace(/\n/g, '<br>');
-            chatMensagens.appendChild(userBubble);
+    if (linkMinhasTarefas) {
+        linkMinhasTarefas.addEventListener('click', (e) => {
+            e.preventDefault();
+            setActiveNav(linkMinhasTarefas);
+            if (secaoResumo) secaoResumo.style.display = 'none';
+            if (tituloPagina) tituloPagina.textContent = 'Minhas Tarefas';
+        });
+    }
 
-            // 2. Limpa o input e rola a tela
-            chatMensagens.scrollTop = chatMensagens.scrollHeight;
-            inputMsgIA.value = "";
-            inputMsgIA.style.height = 'auto'; // Reseta altura do textarea
+    // ==================================================================
+    // 8. LÓGICA DO CHAT IA (RESTAURADA)
+    // ==================================================================
 
-            // 3. (NOVO) Cria e adiciona o indicador de "digitando"
-            const typingIndicator = document.createElement('div');
-            typingIndicator.className = 'chat-message ia-typing'; // Usa o CSS que acabamos de adicionar
-            typingIndicator.id = 'typing-indicator'; // Um ID para fácil remoção
-            typingIndicator.innerHTML = '<span></span><span></span><span></span>';
-            chatMensagens.appendChild(typingIndicator);
+    // Abrir Chat
+    if (btnAbrirChat) {
+        btnAbrirChat.addEventListener('click', () => {
+            modalChat.style.display = 'flex';
+            if (inputChat) inputChat.focus();
+            // Mensagem de boas-vindas se vazio
+            if (areaMensagens && areaMensagens.children.length === 0) {
+                addMessageToChat('Olá! Sou sua assistente de produtividade. Como posso ajudar?', 'ia');
+            }
+        });
+    }
 
-            // Rola para o novo indicador de loading
-            chatMensagens.scrollTop = chatMensagens.scrollHeight;
+    // Fechar Chat
+    if (btnFecharChat) {
+        btnFecharChat.addEventListener('click', () => {
+            modalChat.style.display = 'none';
+        });
+    }
+
+    // Enviar Mensagem
+    if (formChat) {
+        formChat.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const texto = inputChat.value.trim();
+            if (!texto) return;
+
+            // 1. Exibe mensagem do usuário
+            addMessageToChat(texto, 'user');
+            inputChat.value = '';
+            inputChat.style.height = 'auto';
+
+            // 2. Loading
+            const loadingId = showTypingIndicator();
+            scrollToBottom();
 
             try {
-                // 4. Chama o endpoint do GeminiController
-                const response = await fetchApi('/api/v1/google-gemini/chat', {
+                // 3. Chama Backend
+                const response = await authFetch('/api/v1/google-gemini/chat', {
                     method: 'POST',
-                    body: JSON.stringify({ message: mensagem })
+                    body: JSON.stringify({ message: texto })
                 });
 
-                // 5. (NOVO) Remove o indicador de "digitando"
-                document.getElementById('typing-indicator')?.remove(); // O '?' é uma segurança
+                // Remove loading
+                const loader = document.getElementById(loadingId);
+                if(loader) loader.remove();
 
-                // 6. Adiciona a resposta real da IA
-                const reply = response.content || response.reply || "Desculpe, não entendi.";
-
-                const iaBubble = document.createElement('div');
-                iaBubble.className = 'chat-message ia-message';
-                iaBubble.innerHTML = reply.replace(/\n/g, '<br>');
-                chatMensagens.appendChild(iaBubble);
-
-            } catch (err) {
-                // 7. (NOVO) Remove o indicador de "digitando" também em caso de erro
-                document.getElementById('typing-indicator')?.remove();
-
-                const errorBubble = document.createElement('div');
-                errorBubble.className = 'chat-message error-message';
-                errorBubble.textContent = 'Erro ao conectar com a IA.';
-                chatMensagens.appendChild(errorBubble);
+                if (response && response.ok) {
+                    const data = await response.json();
+                    // Resposta da IA
+                    addMessageToChat(data.reply, 'ia');
+                } else {
+                    addMessageToChat('Erro ao processar resposta.', 'error');
+                }
+            } catch (error) {
+                const loader = document.getElementById(loadingId);
+                if(loader) loader.remove();
+                addMessageToChat('Erro de conexão.', 'error');
             }
+            scrollToBottom();
+        });
+    }
 
-            // 8. Rola para a nova mensagem (resposta ou erro)
-            chatMensagens.scrollTop = chatMensagens.scrollHeight;
-            inputMsgIA.focus();
+    // Helpers do Chat
+    function addMessageToChat(text, type) {
+        if (!areaMensagens) return;
+        const div = document.createElement('div');
+
+        if (type === 'user') div.className = 'chat-message user-message';
+        else if (type === 'error') div.className = 'chat-message error-message';
+        else div.className = 'chat-message ia-message';
+
+        div.innerHTML = text.replace(/\n/g, '<br>');
+        areaMensagens.appendChild(div);
+    }
+
+    function showTypingIndicator() {
+        if (!areaMensagens) return null;
+        const id = 'typing-' + Date.now();
+        const div = document.createElement('div');
+        div.className = 'chat-message ia-typing';
+        div.id = id;
+        div.innerHTML = '<span></span><span></span><span></span>';
+        areaMensagens.appendChild(div);
+        return id;
+    }
+
+    function scrollToBottom() {
+        if (areaMensagens) areaMensagens.scrollTop = areaMensagens.scrollHeight;
+    }
+
+    if (inputChat) {
+        inputChat.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
         });
 
-    // Auto-resize do textarea do chat
-    inputMsgIA.addEventListener('input', function() {
-        this.style.height = 'auto';
-        const maxHeight = 120; // 120px (definido no CSS)
-        this.style.height = (Math.min(this.scrollHeight, maxHeight)) + 'px';
-    });
-
-    // Enviar com Enter (e Shift+Enter para nova linha)
-    inputMsgIA.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            formConversaIA.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-        }
-    });
-
-    // -----------------------------------------------------------------
-    // 5. INICIALIZAÇÃO
-    // -----------------------------------------------------------------
-    if (token) {
-        loadUserProfile();
-        loadDashboardData();
-    } else {
-        // Se não houver token, chuta para a tela de login
-        window.location.href = 'login.html';
+        // Enviar com Enter (sem Shift)
+        inputChat.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                formChat.dispatchEvent(new Event('submit'));
+            }
+        });
     }
+
+    // ==================================================================
+    // 9. INICIALIZAÇÃO FINAL
+    // ==================================================================
+    loadUserProfile();
+    fetchTasks();
 
 }); // Fim do DOMContentLoaded

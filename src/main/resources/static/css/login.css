@@ -10,6 +10,8 @@
     --color-text-secondary: #A8B5C3;/* Texto secundário/labels */
     --color-primary: #5865F2;       /* Azul/Roxo do tema */
     --color-warning: #F9A839;       /* Laranja/Amarelo para links */
+
+    --font-family: 'Inter', sans-serif;
 }
 
 body {

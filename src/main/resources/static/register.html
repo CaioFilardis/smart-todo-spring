@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Cadastro - Smart Todo</title>
+    <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Adicione spinner e loading CSS aqui ou no seu style.css */
         .loading {
@@ -34,113 +36,50 @@
     </style>
 </head>
 <body>
-<div class="container">
-    <h2>Cadastre-se na plataforma</h2>
-    <form id="registerForm" class="login-form">
-        <input type="text" name="fullName" class="form-control" placeholder="Nome completo" required>
-        <input type="email" name="email" class="form-control" placeholder="Email" required>
-        <input type="password" name="password" class="form-control" placeholder="Senha" required>
-        <div id="password-strength" class="password-strength-text"></div>
-        <input type="password" name="confirmPassword" class="form-control" placeholder="Confirmar senha" required>
-        <div class="alert alert-error" style="display:none;"></div>
-        <div class="alert alert-success" style="display:none;"></div>
-        <button type="submit" class="btn btn-primary w-100 d-flex justify-content-center align-items-center gap-2">Cadastrar</button>
-    </form>
-    <a href="login.html">Já tem conta? Faça login.</a>
-</div>
+<div class="container min-vh-100 d-flex justify-content-center align-items-center">
+    <div class="card p-4 shadow" style="max-width: 440px; width: 100%;">
+        <div class="mb-4 text-center">
+            <h2 class="text-primary">Crie sua Conta</h2>
+            <p class="text-secondary">Comece a organizar sua vida hoje</p>
+        </div>
 
-<!-- Modal de Sucesso -->
-<div id="successModal" class="modal">
-    <div class="modal-content">
-        <span class="close" id="closeModal">&times;</span>
-        <p>Usuário cadastrado!</p>
+        <form id="registerForm">
+            <div class="mb-3">
+                <label class="form-label">Nome Completo</label>
+                <input type="text" name="fullName" class="form-control" placeholder="Ex: João Silva" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">E-mail</label>
+                <input type="email" name="email" class="form-control" placeholder="seu@email.com" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Senha</label>
+                <input type="password" name="password" class="form-control" placeholder="Min. 8 caracteres" required>
+                <div class="progress mt-2" style="height: 4px;">
+                    <div id="password-strength-bar" class="progress-bar bg-danger" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Confirmar Senha</label>
+                <input type="password" name="confirmPassword" class="form-control" placeholder="Repita a senha" required>
+            </div>
+
+            <div class="alert alert-danger d-none" id="register-error"></div>
+            <div class="alert alert-success d-none" id="register-success"></div>
+
+            <button type="submit" class="btn btn-primary w-100 d-flex justify-content-center align-items-center gap-2">
+                <span id="btn-register-spinner" class="spinner-border spinner-border-sm d-none"></span>
+                <span id="btn-register-text">Cadastrar</span>
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="login.html" class="link-warning">Já tem conta? Faça login.</a>
+        </div>
     </div>
 </div>
-
-<!-- Loading -->
-<div id="loading" class="loading" style="display: none;">
-    <div class="spinner"></div>
-    <span>Aguarde, processando cadastro...</span>
-</div>
-
-<script>
-    const registerForm = document.getElementById('registerForm');
-    const modal = document.getElementById("successModal");
-    const closeBtn = document.getElementById("closeModal");
-    const loading = document.getElementById('loading');
-
-    registerForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const errorBox = document.querySelector('.alert-error');
-        const successBox = document.querySelector('.alert-success');
-        errorBox.style.display = "none";
-        successBox.style.display = "none";
-
-        const senha = registerForm.password.value;
-        const confirmar = registerForm.confirmPassword.value;
-        const submitBtn = registerForm.querySelector('button[type="submit"]'); // Botão submit
-
-        if (senha !== confirmar) {
-            errorBox.textContent = 'As senhas não coincidem!';
-            errorBox.style.display = "block";
-            return;
-        }
-        const data = {
-            fullName: registerForm.fullName.value,
-            email: registerForm.email.value,
-            password: senha,
-            confirmPassword: confirmar
-        };
-
-        submitBtn.disabled = true;
-        loading.style.display = "flex"; // Mostra loading
-
-        fetch('/api/v1/auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-            .then(async response => {
-                loading.style.display = "none"; // Esconde loading quando acaba
-                submitBtn.disabled = false;
-
-                if (response.ok) {
-                    successBox.textContent = "Usuário cadastrado com sucesso!";
-                    successBox.style.display = "block";
-                    setTimeout(() => {
-                        successBox.style.display = "none";
-                        window.location.href = "login.html";
-                    }, 2000);
-                } else {
-                    const res = await response.json();
-                    errorBox.textContent = res.message || "Cadastro falhou!";
-                    errorBox.style.display = "block";
-                    setTimeout(() => { errorBox.style.display = "none"; }, 4000);
-                }
-            })
-            .catch(error => {
-                loading.style.display = "none";
-                errorBox.textContent = "Erro: " + error.message;
-                errorBox.style.display = "block";
-                setTimeout(() => { errorBox.style.display = "none"; }, 4000);
-            });
-    });
-
-    // Fechar modal clicando no botão X
-    closeBtn.onclick = function() {
-        modal.classList.remove('active');
-        window.location.href = "login.html";
-    };
-
-    // Fechar modal clicando fora do modal-content
-    modal.onclick = function(e) {
-        if (e.target === modal) {
-            modal.classList.remove('active');
-            window.location.href = "login.html";
-        }
-    };
-</script>
 </body>
 </html>

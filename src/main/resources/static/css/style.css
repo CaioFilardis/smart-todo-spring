@@ -28,7 +28,7 @@
     --color-priority-medium: #F9A839; /* Laranja para prioridade */
     --color-priority-low: #43B581;    /* Verde para prioridade */
 
-    --font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-family: 'Inter', sans-serif;
     --sidebar-width: 260px;
     --border-radius: 8px;
 }
@@ -551,48 +551,68 @@ body.sidebar-open .sidebar {
    ESTILOS DOS MODAIS (Genérico)
    ============================================ */
 
+/* Fundo Escuro (Overlay) */
 .modal {
     position: fixed;
-    z-index: 1000;
+    z-index: 2000; /* Alto z-index para ficar acima da Sidebar */
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background: rgba(0, 0, 0, 0.6);
-    display: none; /* Alterado por JS para 'flex' */
+    overflow: hidden; /* Evita scroll no fundo */
+    background-color: rgba(0, 0, 0, 0.7); /* Fundo escuro */
+    backdrop-filter: blur(4px); /* Efeito de desfoque moderno */
+
+    /* Flexbox para centralizar perfeitamente */
+    display: none; /* JS muda para 'flex' */
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(5px);
-    animation: fadeIn 0.3s ease-out;
-}
+
+    opacity: 0;
+    transition: opacity 0.3s ease;
+ }
+
+ .modal[style*="display: flex"] {
+     opacity: 1;
+ }
 
 .modal-content {
-    background: var(--color-bg-card);
-    color: var(--color-text-primary);
-    padding: 32px;
-    border-radius: var(--border-radius);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    width: 90%;
-    max-width: 500px;
-    position: relative;
-    animation: fadeIn 0.4s ease-out;
+    background-color: var(--color-bg-card); /* #363940 */
+        color: var(--color-text-primary);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 32px;
+        width: 90%;
+        max-width: 500px; /* Largura padrão */
+        position: relative;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+
+        /* Animação de entrada */
+        transform: translateY(20px) scale(0.95);
+        animation: modalPop 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .modal-content .close {
     position: absolute;
-    right: 16px;
-    top: 16px;
-    color: var(--color-text-secondary);
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: color 0.2s, transform 0.2s;
+        top: 20px;
+        right: 20px;
+        color: var(--color-text-secondary);
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        line-height: 1;
+        transition: color 0.2s;
 }
+
 .modal-content .close:hover {
-    color: var(--color-text-primary);
-    transform: scale(1.1);
+    color: var(--color-danger);
 }
 
 .modal-content h3 {
@@ -603,19 +623,21 @@ body.sidebar-open .sidebar {
 
 /* Inputs dentro do modal */
 .modal-content .form-control {
-    background-color: var(--color-bg-input);
-    border-color: var(--color-bg-card);
-    margin-bottom: 16px;
+    margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 20px;
+        color: var(--color-text-header);
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        padding-bottom: 10px;
 }
 .modal-content .form-control:focus {
     border-color: var(--color-primary);
 }
 .modal-content label {
     display: block;
-    text-align: left;
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 8px;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: var(--color-text-secondary);
 }
 .modal-content .mb-3 {
     margin-bottom: 16px;
@@ -625,6 +647,35 @@ body.sidebar-open .sidebar {
 .modal-content button[type="submit"] {
     width: 100%;
     margin-top: 8px;
+}
+
+.modal-content input[type="text"],
+.modal-content textarea {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    background-color: var(--color-bg-input); /* #1F2327 */
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: var(--color-text-primary);
+    font-family: var(--font-family);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.2);
+}
+
+/* Botão Salvar (Full Width) */
+.modal-content button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin-top: 10px;
 }
 
 /* Overlay para o menu mobile */
@@ -652,217 +703,266 @@ body.sidebar-open .sidebar-overlay {
 }
 
 /* ============================================
+   ESTILOS DOS MODAIS (Genérico)
+   ============================================ */
+
+/* Fundo Escuro (Overlay) */
+.modal {
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+
+    /* Flexbox para centralizar */
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Classe auxiliar para animação de fade in */
+.modal.show-modal {
+    opacity: 1;
+}
+
+/* Caixa do Modal */
+.modal-content {
+    background-color: var(--color-bg-card);
+    color: var(--color-text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 32px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+
+    transform: translateY(20px) scale(0.95);
+    animation: modalPop 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Botão Fechar (X) */
+.modal-content .close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: var(--color-text-secondary);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+}
+.modal-content .close:hover { color: var(--color-danger); }
+
+.modal-content h3 {
+    font-size: 22px;
+    text-align: left;
+    margin-bottom: 24px;
+    margin-top: 0;
+}
+
+/* Inputs dentro do Modal (Estilo Unificado) */
+.modal-content label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+.modal-content .form-control,
+.modal-content input[type="text"],
+.modal-content textarea {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    background-color: var(--color-bg-input);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: var(--color-text-primary);
+    font-family: var(--font-family);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    /* Remove estilos conflitantes anteriores */
+    margin-top: 0;
+    box-shadow: none;
+}
+
+.modal-content .form-control:focus,
+.modal-content input:focus,
+.modal-content textarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.2);
+}
+
+.modal-content button[type="submit"] {
+    width: 100%;
+    padding: 16px;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.modal-content button[type="submit"].ia {
+    width: 5%;
+    padding: 12px;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+/* ============================================
    ESTILOS DO MODAL DE CHAT IA (CORRIGIDO)
    ============================================ */
 
 .modal-content.modal-chat {
     max-width: 600px;
-    padding: 0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
     height: 80vh;
     max-height: 700px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-.modal-header {
+.modal-chat .modal-header {
+    padding: 20px 24px;
+    background-color: rgba(0,0,0,0.2);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 24px;
-    background-color: var(--color-bg-sidebar);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    flex-shrink: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
-.modal-header h3 {
-    margin: 0;
-    font-size: 18px;
-}
-.modal-header .close {
-    position: static;
-    font-size: 24px;
-    padding: 4px;
-}
+.modal-chat .modal-header h3 { margin: 0; padding: 0; border: none; }
+.modal-chat .close { position: static; }
 
+/* CORREÇÃO CRÍTICA AQUI: Flex Direction Column */
 .chat-window {
+    flex: 1; /* Ocupa o espaço restante */
+    padding: 20px 24px;
     background-color: var(--color-bg-main);
-    flex: 1;
-    padding: 24px;
-    margin: 0;
     overflow-y: auto;
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    scroll-behavior: smooth;
+    flex-direction: column; /* Mensagens uma embaixo da outra */
+    gap: 16px;
 }
 
-/* Estilização da barra de rolagem (Chrome/Safari) */
-.chat-window::-webkit-scrollbar { width: 8px; }
-.chat-window::-webkit-scrollbar-track { background: var(--color-bg-sidebar); border-radius: 4px; }
-.chat-window::-webkit-scrollbar-thumb { background-color: var(--color-secondary); border-radius: 4px; }
-.chat-window::-webkit-scrollbar-thumb:hover { background-color: var(--color-secondary-hover); }
+/* Scrollbar customizada */
+.chat-window::-webkit-scrollbar { width: 6px; }
+.chat-window::-webkit-scrollbar-track { background: transparent; }
+.chat-window::-webkit-scrollbar-thumb { background-color: var(--color-bg-card); border-radius: 3px; }
 
+/* Balões de Mensagem */
 .chat-message {
     padding: 12px 16px;
-    border-radius: 14px;
+    border-radius: 12px;
     max-width: 80%;
     line-height: 1.5;
     word-wrap: break-word;
     animation: fadeIn 0.3s ease-out;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 15px;
 }
+
 .user-message {
-    align-self: flex-end;
-    background-color: var(--color-primary);
-    color: #FFFFFF;
-    border-bottom-right-radius: 4px;
+    align-self: flex-end; /* Direita */
+    background: linear-gradient(135deg, var(--color-primary) 0%, #4752C4 100%);
+    color: #fff;
+    border-bottom-right-radius: 2px;
+    box-shadow: 0 4px 12px rgba(88, 101, 242, 0.2);
 }
+
 .ia-message {
-    align-self: flex-start;
+    align-self: flex-start; /* Esquerda */
     background-color: var(--color-bg-card);
     color: var(--color-text-primary);
-    border-bottom-left-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-bottom-left-radius: 2px;
 }
+
 .error-message {
     align-self: center;
-    background-color: rgba(237, 66, 69, 0.2);
+    background-color: rgba(237, 66, 69, 0.1);
     color: var(--color-danger);
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 13px;
+    border: 1px solid rgba(237, 66, 69, 0.2);
 }
 
-/* Formulário de input na base do modal */
+/* Área de Input do Chat (Footer) */
 .chat-form {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
     padding: 16px 24px;
-    background-color: var(--color-bg-sidebar); /* Cor escura do header */
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    flex-shrink: 0;
+    background-color: var(--color-bg-card);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
 }
 
-
-/* Textarea do chat */
-.modal-content .chat-form .form-control {
-    flex: 1; /* <-- Garante que o textarea ocupe o espaço */
-    width: auto; /* <-- Reseta qualquer width: 100% */
+.chat-form textarea.form-control {
+    margin: 0;
     resize: none;
-    overflow-y: auto;
-    min-height: 48px;
+    height: 48px;
     max-height: 120px;
-    line-height: 1.5;
-    margin-bottom: 0;
-    border-radius: 24px; /* BORDAS ARREDONDADAS */
+    border-radius: 24px;
     padding: 12px 20px;
-    color: var(--color-text-primary);
-    background-color: var(--color-bg-main);
-    border-color: var(--color-bg-main);
-}
-.modal-content .chat-form .form-control:focus {
-    border-color: var(--color-primary);
-    background-color: var(--color-bg-main);
-    box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.3);
-    transform: none;
+    background-color: var(--color-bg-input);
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
-/* Botão de Enviar (estilo botão circular) */
-.modal-content .chat-form .btn-send {
-    width: 48px;  /* <-- Força a largura fixa */
-    height: 48px; /* <-- Força a altura fixa */
+.chat-form .btn-send {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
     padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
-    border-radius: 50%; /* Botão redondo */
-    margin-top: 0; /* <-- Reseta a margem da regra genérica */
+    background-color: var(--color-primary);
+    color: white;
+    transition: transform 0.2s;
 }
-
-.chat-form .btn-send i {
-    margin-right: 0;
-    margin-left: 2px;
-}
+.chat-form .btn-send:hover { transform: scale(1.05); }
+.chat-form .btn-send i { margin-left: -2px; }
 
 /* ============================================
-   ESTILOS DO INDICADOR DE "DIGITANDO..." (LOADING)
+   ESTILOS DO INDICADOR DE "DIGITANDO..."
    ============================================ */
-
-/* A "bolha" que contém a animação */
 .chat-message.ia-typing {
-    align-self: flex-start; /* Alinha à esquerda, como a bolha da IA */
+    align-self: flex-start;
     background-color: var(--color-bg-card);
-    padding: 14px 18px; /* Um pouco mais de padding para os pontos */
-    border-bottom-left-radius: 4px;
+    padding: 14px 18px;
+    border-bottom-left-radius: 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
 }
 
-/* Os três pontos que pulam */
 .ia-typing span {
     display: inline-block;
-    width: 8px;
-    height: 8px;
-    margin: 0 1px;
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-text-secondary);
     border-radius: 50%;
-    background-color: var(--color-text-secondary); /* Cor cinza do texto */
-    animation: typing-bounce 1.3s infinite ease-in-out;
+    animation: typing-bounce 1.4s infinite ease-in-out both;
 }
 
-/* Animação de pulo com atraso para cada ponto */
 .ia-typing span:nth-child(1) { animation-delay: -0.32s; }
 .ia-typing span:nth-child(2) { animation-delay: -0.16s; }
-.ia-typing span:nth-child(3) { animation-delay: 0s; }
 
 @keyframes typing-bounce {
-    0%, 80%, 100% {
-        transform: scale(0);
-    }
-    40% {
-        transform: scale(1.0);
-    }
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.skeleton {
-  background: linear-gradient(90deg, #363940 0%, #2C2F36 50%, #363940 100%);
-  background-size: 200% 100%;
-  animation: loading 2s infinite;
-}
-
-@keyframes loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-main {
-  animation: fadeInUp 0.4s ease-out;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
-.empty-state {
-  text-align: center;
-  padding: 60px 24px;
-  color: var(--color-text-secondary);
-}
-
-.empty-icon {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 24px;
-  opacity: 0.3;
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }}

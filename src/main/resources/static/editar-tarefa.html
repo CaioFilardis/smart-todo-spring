@@ -5,36 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Tarefa - Smart Todo</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="./css/editar-tarefa.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="stylesheet" href="css/editar-tarefa.css">
 
     <script src="https://unpkg.com/feather-icons"></script>
 </head>
-<body>
+<body class="edit-page-body">
 
 <div class="edit-task-container">
-    <form id="formEditarTarefa" class="card">
 
-        <a href="index.html" class="back-link">
-            <i data-feather="arrow-left"></i>
-            <span>Voltar para o Dashboard</span>
-        </a>
+    <a href="dashboard.html" class="back-link mb-3">
+        <i data-feather="arrow-left"></i>
+        <span>Voltar para o Dashboard</span>
+    </a>
 
-        <h2>Editar Tarefa</h2>
+    <form id="formEditarTarefa" class="card shadow-lg">
 
-        <div class="form-group">
-            <label for="title">Título</label>
-            <input type="text" name="title" id="title" class="form-control" required>
+        <div class="form-header mb-4">
+            <h2 class="m-0">Editar Tarefa</h2>
+            <p class="text-secondary small m-0">Atualize os detalhes da sua tarefa</p>
         </div>
 
-        <div class="form-group">
-            <label for="description">Descrição</label>
-            <textarea name="description" id="description" class="form-control" rows="5"></textarea>
+        <div class="form-group mb-3">
+            <label for="title" class="form-label">Título</label>
+            <input type="text" name="title" id="title" class="form-control" placeholder="Título da tarefa..." required>
         </div>
 
-        <div class="form-group">
-            <label for="priority">Prioridade</label>
+        <div class="form-group mb-3">
+            <label for="description" class="form-label">Descrição</label>
+            <textarea name="description" id="description" class="form-control" rows="5" placeholder="Descreva os detalhes..."></textarea>
+        </div>
+
+        <div class="form-group mb-4">
+            <label for="priority" class="form-label">Prioridade</label>
             <select name="priority" id="priority" class="form-control" required>
                 <option value="" disabled>Selecione a prioridade</option>
                 <option value="LOW">Baixa</option>
@@ -43,12 +49,14 @@
             </select>
         </div>
 
-        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        <button type="submit" class="btn btn-primary w-100">
+            <i data-feather="save"></i> Salvar Alterações
+        </button>
     </form>
 </div>
 
 <script>
-    feather.replace(); // Ativa os ícones
+    feather.replace();
 </script>
 <script src="./js/editar-tarefa.js"></script>
 </body>
